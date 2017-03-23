@@ -51,6 +51,8 @@ def imageTgz = "${project.name}.tgz"
 
 def installOssim = true
 
+version "${buildVersion}-${buildVersionTag}"
+
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = 'o2-delivery/dev/docker'
   key = "${project.ext.baseImage}.tgz"
