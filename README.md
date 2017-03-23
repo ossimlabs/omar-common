@@ -1,4 +1,32 @@
 # omar-common
-OMAR common files
+*This repository houses files that are used throughout many of the O2/OMAR apps and plugins.*
 
-Test
+### omar-common-properties.gradle
+The common properties file is a  [Gradle](https://gradle.org/) file that contains the tasks need to build an O2 application.
+
+You will need to modify you shell enviornment to point to the location of the .gradle file.
+
+For example you will need to edit your .bashrc file, and add:
+
+```
+export OMAR_COMMON_PROPERTIES=$HOME/repos/rbt/omar-common/omar-common-properties.gradle
+```
+
+It utilizes two Gradle plugins to aid in some of the tasks.  These plugins simplify some of the items that are conducted during the build process.
+
+#### Plugins used:
+[Gradle Docker plugin](https://github.com/bmuschko/gradle-docker-plugin)
+
+[Gradle S3 Plugin](https://github.com/skhatri/gradle-s3-plugin)
+
+#### Gradle specific tasks:
+* downloadBaseImage:
+* loadBaseDockerImage
+* createDockerfile
+* buildDockerImage
+* tagDockerImage
+* logIn
+* pushDockerImage
+* saveDockerImage
+* dockerImageToS3
+* buildAllArtifacts
