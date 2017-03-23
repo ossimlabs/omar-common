@@ -29,69 +29,55 @@ ext {
   buildVersionTag="SNAPSHOT" // SNAPSHOT or RELEASE
   artifactoryContextUrl="https://artifacts.radiantbluecloud.com/artifactory"
   ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
-  artifactoryUser="${System.env.ARTIFACTORY_USER}"
-  artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
-  jarArtifactsChanging="${buildVersionTag}"=="SNAPSHOT"?true:false
-  dockerRegistryUrl="docker-registry-default.ossim.io"
-  registryProjectName="o2"
-  baseImage="o2-base"
-  openShiftUrl="https://openshift-master.ossim.io:8443"
-  dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
-  openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
-  openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
+  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
 }
 
-version "${buildVersion}-${buildVersionTag}"
+def artifactoryUser="${System.env.ARTIFACTORY_USER}"
+def artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
+
+def openShiftUrl="https://openshift-master.ossim.io:8443"
+def dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
+
+def dockerRegistryUrl="docker-registry-default.ossim.io"
+def registryProjectName="o2"
+
+def openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
+def openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
 
 def dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
-def baseImageTgz = "${baseImage}.tgz"
+
 def image = "${project.name}:${dockerAppTag}"
 def imageTgz = "${project.name}.tgz"
 
-task logIn (dependsOn: 'assemble') {
-  doLast {
-    exec {
-      commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
-       '-u', openShiftUserName,
-       '-p', openShiftPassword
-    }
-    def loginTokenStream = new ByteArrayOutputStream()
-    exec {
-      commandLine 'oc', 'whoami', '-t'
-      standardOutput loginTokenStream
-    }
-    def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
-    println loginToken
-    exec {
-     commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
-    }
-  }
-}
+def installOssim = true
 
-task downloadBaseImage(type: com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: logIn) {
+task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = 'o2-delivery/dev/docker'
-  key = baseImageTgz
-  saveTo = "build/libs/${baseImageTgz}"
+  key = "${project.ext.baseImage}.tgz"
+  saveTo = "build/libs/${project.ext.baseImage}.tgz"
 }
 
 task loadBaseDockerImage(dependsOn: downloadBaseImage) {
+
   doLast {
     exec {
-      commandLine 'docker', 'load', '-i', "build/libs/${baseImageTgz}"
+      commandLine 'docker', 'load', '-i', "build/libs/${project.ext.baseImage}.tgz"
     }
   }
 }
 
 task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage) {
-    destFile = project.file('build/libs/Dockerfile')
-    from baseImage
-    maintainer "DigitalGlobe-RadiantBlue"
-    runCommand 'useradd omar'
-    copyFile "${project.name}-${version}.jar", "/home/omar"
-    user 'omar'
-    workingDir '/home/omar'
-    exposePort 8080
-    defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', "/home/omar/${project.name}-${version}.jar"
+  def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
+
+  destFile = project.file('build/libs/Dockerfile')
+  from project.ext.baseImage
+  maintainer "DigitalGlobe-RadiantBlue"
+  runCommand 'useradd omar'
+  copyFile jarName, "/home/omar"
+  user 'omar'
+  workingDir '/home/omar'
+  exposePort 8080
+  defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
 }
 
 task buildDockerImage(type: DockerBuildImage, dependsOn: createDockerfile) {
@@ -105,7 +91,30 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
   repository  "${dockerNamespaceUrl}${project.name}"
 }
 
-task pushDockerImage(type: DockerPushImage, dependsOn: tagDockerImage) {
+task logIn (dependsOn: tagDockerImage) {
+  doLast {
+
+    exec {
+      commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
+       '-u', openShiftUserName,
+       '-p', openShiftPassword
+    }
+
+    def loginTokenStream = new ByteArrayOutputStream()
+    exec {
+      commandLine 'oc', 'whoami', '-t'
+      standardOutput loginTokenStream
+    }
+
+    def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
+    println loginToken
+    exec {
+     commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
+    }
+  }
+}
+
+task pushDockerImage(type: DockerPushImage, dependsOn: logIn) {
   imageName "${dockerNamespaceUrl}${image}"
 }
 
@@ -124,7 +133,7 @@ task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, depends
   file = "build/libs/${imageTgz}"
 }
 
-task removeArtifacts(dependsOn: dockerImageToS3) {
+task buildAllArtifacts(dependsOn: dockerImageToS3) {
   doLast{
     exec {
       // Removes the image that is pushed to the remote repository
@@ -138,7 +147,7 @@ task removeArtifacts(dependsOn: dockerImageToS3) {
     }
     exec {
       // Removes the 'o2-base' image used during the build process
-      commandLine 'docker', 'rmi', "-f", baseImage
+      commandLine 'docker', 'rmi', "-f", project.ext.baseImage
     }
     exec {
       // Removes the zipped image that was pushed to S3
@@ -146,7 +155,7 @@ task removeArtifacts(dependsOn: dockerImageToS3) {
     }
     exec {
       // Removes the base image zip file
-      commandLine 'rm', "build/libs/${baseImageTgz}"
+      commandLine 'rm', "build/libs/${project.ext.baseImage}.tgz"
     }
   }
 }
