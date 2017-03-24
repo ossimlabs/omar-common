@@ -7,8 +7,13 @@ import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 buildscript {
     ext {
         grailsVersion = project.grailsVersion
+        artifactoryContextUrl="https://artifacts.radiantbluecloud.com/artifactory"
+        ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
     }
     repositories {
+
+     mavenLocal()
+     maven { url "${ossimMavenProxy}" }
       jcenter()
       maven {
         url "https://plugins.gradle.org/m2/"
@@ -27,8 +32,6 @@ apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 
 ext {
   buildVersionTag="SNAPSHOT" // SNAPSHOT or RELEASE
-  artifactoryContextUrl="https://artifacts.radiantbluecloud.com/artifactory"
-  ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
   jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
 }
 
