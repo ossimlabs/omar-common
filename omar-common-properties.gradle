@@ -59,7 +59,7 @@ version "${buildVersion}-${buildVersionTag}"
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = 'o2-delivery/dev/docker'
   key = "${project.ext.baseImage}.tgz"
-  saveTo = "build/libs/${project.ext.baseImage}.tgz"
+  saveTo = file("build/libs/${project.ext.baseImage}.tgz")
 }
 
 task loadBaseDockerImage(dependsOn: downloadBaseImage) {
