@@ -98,11 +98,30 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
 
 task logIn (dependsOn: tagDockerImage) {
   doLast {
+    def login = false
+    def count = 0
+    def numRetries = 3
+    def sleepMillis = 1000
+    while(!login && count < numRetries){
+      try{
+        exec {
+          commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
+           '-u', openShiftUserName,
+           '-p', openShiftPassword
+        }
+        login = true
+      }
+      catch(e){
 
-    exec {
-      commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
-       '-u', openShiftUserName,
-       '-p', openShiftPassword
+        println 'Openshift login failed!'
+        count++
+        if(count < numRetries){
+          Thread.sleep(sleepMillis)
+        }
+        else {
+          throw(e)
+        }
+      }
     }
 
     def loginTokenStream = new ByteArrayOutputStream()
@@ -138,7 +157,7 @@ task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, depends
   file = "build/libs/${imageTgz}"
 }
 
-task buildAllArtifacts(dependsOn: dockerImageToS3) {
+task doAll(dependsOn: dockerImageToS3) {
   doLast{
     exec {
       // Removes the image that is pushed to the remote repository
