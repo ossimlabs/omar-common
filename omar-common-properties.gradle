@@ -81,6 +81,8 @@ task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage) {
   copyFile jarName, "/home/omar"
   user 'omar'
   workingDir '/home/omar'
+  envvironmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
+  envvironmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
   exposePort 8080
   defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
 }
