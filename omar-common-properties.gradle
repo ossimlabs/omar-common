@@ -190,7 +190,7 @@ artifactory {
   contextUrl = "${artifactoryContextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
   publish {
     repository {
-      repoKey = "libs-${buildVersionTag.toLowerCase()}-local"
+      repoKey = "omar-local"
       username = "${artifactoryUser}"
       password = "${artifactoryPassword}"
       maven = true
@@ -201,7 +201,7 @@ artifactory {
   }
   resolve {
     repository {
-      repoKey = "libs-${buildVersionTag.toLowerCase()}"
+      repoKey = "omar-local"
       username = "${artifactoryUser}"
       password = "${artifactoryPassword}"
       maven = true
