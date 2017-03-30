@@ -183,7 +183,7 @@ task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, depends
   file = project.file("build/libs/${imageTgz}").toString()
 }
 
-task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
+task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: createDockerfile) {
   bucket = 'o2-delivery/dev/docker'
   key = "${project.name}-Dockerfile"
   file = createDockerfile.destFile.toString()
