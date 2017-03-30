@@ -105,9 +105,8 @@ task createDockerfile(type: Dockerfile){
 }
 
 task buildDockerImage(type: DockerBuildImage) {
-  dependsOn logIn 
   dependsOn createDockerfile
-  
+  dependsOn logIn 
   inputDir = createDockerfile.destFile.parentFile
   tag = "${image}"
 }
