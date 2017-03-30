@@ -52,6 +52,7 @@ ext {
  artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
  openShiftUrl="https://openshift-master.ossim.io:8443"
+ yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
  dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
 
  dockerRegistryUrl="docker-registry-default.ossim.io"
@@ -189,18 +190,18 @@ task doAll(dependsOn: dockerImageToS3) {
       // from the local Docker registry
       commandLine 'docker', 'rmi', "-f", image
     }
-    exec {
-      // Removes the 'o2-base' image used during the build process
-      commandLine 'docker', 'rmi', "-f", project.ext.baseImage
-    }
-    exec {
-      // Removes the zipped image that was pushed to S3
-      commandLine 'rm', "build/libs/${imageTgz}"
-    }
-    exec {
-      // Removes the base image zip file
-      commandLine 'rm', "build/libs/${project.ext.baseImage}.tgz"
-    }
+//    exec {
+//      // Removes the 'o2-base' image used during the build process
+//      commandLine 'docker', 'rmi', "-f", project.ext.baseImage
+//    }
+//    exec {
+//      // Removes the zipped image that was pushed to S3
+//      commandLine 'rm', "build/libs/${imageTgz}"
+//    }
+//    exec {
+//      // Removes the base image zip file
+//      commandLine 'rm', "build/libs/${project.ext.baseImage}.tgz"
+//    }
   }
 }
 
