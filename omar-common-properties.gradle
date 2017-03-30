@@ -30,29 +30,43 @@ apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 
-ext {
-  buildVersionTag="SNAPSHOT" // SNAPSHOT or RELEASE
-  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
+def getCurrentGitBranch() {
+    def gitBranch = "Unknown branch"
+    try {
+        def workingDir = new File("${project.projectDir}")
+        def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
+        result.waitFor()
+        if (result.exitValue() == 0) {
+            gitBranch = result.text.trim()
+        }
+    } catch (e) {
+    }
+    return gitBranch
 }
+def gitBranch=getCurrentGitBranch()
 
-def artifactoryUser="${System.env.ARTIFACTORY_USER}"
-def artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
+ext {
+  buildVersionTag=gitBranch=="dev"?"SNAPSHOT":"RELEASE"//"SNAPSHOT" // SNAPSHOT or RELEASE
+  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
+ artifactoryUser="${System.env.ARTIFACTORY_USER}"
+ artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
-def openShiftUrl="https://openshift-master.ossim.io:8443"
-def dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
+ openShiftUrl="https://openshift-master.ossim.io:8443"
+ dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
 
-def dockerRegistryUrl="docker-registry-default.ossim.io"
-def registryProjectName="o2"
+ dockerRegistryUrl="docker-registry-default.ossim.io"
+ registryProjectName="o2"
 
-def openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
-def openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
+ openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
+ openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
 
-def dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
+ dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
 
-def image = "${project.name}:${dockerAppTag}"
-def imageTgz = "${project.name}.tgz"
+ image = "${project.name}:${dockerAppTag}"
+ imageTgz = "${project.name}.tgz"
 
-def installOssim = true
+ installOssim = true
+}
 
 version "${buildVersion}-${buildVersionTag}"
 
@@ -71,7 +85,7 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
   }
 }
 
-task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage) {
+task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage){
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
 
   destFile = project.file('build/libs/Dockerfile')
@@ -92,13 +106,13 @@ task buildDockerImage(type: DockerBuildImage, dependsOn: createDockerfile) {
     tag = "${image}"
 }
 
-task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
+task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
   imageId "${image}"
   tag "${dockerAppTag}"
   repository  "${dockerNamespaceUrl}${project.name}"
 }
 
-task logIn (dependsOn: tagDockerImage) {
+task logIn () {
   doLast {
     def login = false
     def count = 0
@@ -140,7 +154,11 @@ task logIn (dependsOn: tagDockerImage) {
   }
 }
 
-task pushDockerImage(type: DockerPushImage, dependsOn: logIn) {
+task pushDockerImage(type: DockerPushImage){
+
+  dependsOn tagDockerImage
+  dependsOn logIn 
+  
   imageName "${dockerNamespaceUrl}${image}"
 }
 
