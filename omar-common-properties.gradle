@@ -104,9 +104,12 @@ task createDockerfile(type: Dockerfile){
   defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
 }
 
-task buildDockerImage(type: DockerBuildImage, dependsOn: createDockerfile) {
-    inputDir = createDockerfile.destFile.parentFile
-    tag = "${image}"
+task buildDockerImage(type: DockerBuildImage) {
+  dependsOn logIn 
+  dependsOn createDockerfile
+  
+  inputDir = createDockerfile.destFile.parentFile
+  tag = "${image}"
 }
 
 task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
@@ -160,7 +163,6 @@ task logIn () {
 task pushDockerImage(type: DockerPushImage){
 
   dependsOn tagDockerImage
-  dependsOn logIn 
   
   imageName "${dockerNamespaceUrl}${image}"
 }
