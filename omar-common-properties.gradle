@@ -71,6 +71,49 @@ ext {
 
 version "${buildVersion}-${buildVersionTag}"
 
+task logIn () {
+  doLast {
+    def login = false
+    def count = 0
+    def numRetries = 3
+    def sleepMillis = 1000
+    while(!login && count < numRetries){
+      try{
+        exec {
+          commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
+           '-u', openShiftUserName,
+           '-p', openShiftPassword
+        }
+        login = true
+      }
+      catch(e){
+
+        println 'Openshift login failed!'
+        count++
+        if(count < numRetries){
+          Thread.sleep(sleepMillis)
+        }
+        else {
+          throw(e)
+        }
+      }
+    }
+
+    def loginTokenStream = new ByteArrayOutputStream()
+    exec {
+      commandLine 'oc', 'whoami', '-t'
+      standardOutput loginTokenStream
+    }
+
+    def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
+    println loginToken
+    exec {
+     commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
+    }
+  }
+}
+
+
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = 'o2-delivery/dev/docker'
   key = "${project.ext.baseImage}.tgz"
@@ -117,47 +160,6 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
   repository  "${dockerNamespaceUrl}${project.name}"
 }
 
-task logIn () {
-  doLast {
-    def login = false
-    def count = 0
-    def numRetries = 3
-    def sleepMillis = 1000
-    while(!login && count < numRetries){
-      try{
-        exec {
-          commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
-           '-u', openShiftUserName,
-           '-p', openShiftPassword
-        }
-        login = true
-      }
-      catch(e){
-
-        println 'Openshift login failed!'
-        count++
-        if(count < numRetries){
-          Thread.sleep(sleepMillis)
-        }
-        else {
-          throw(e)
-        }
-      }
-    }
-
-    def loginTokenStream = new ByteArrayOutputStream()
-    exec {
-      commandLine 'oc', 'whoami', '-t'
-      standardOutput loginTokenStream
-    }
-
-    def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
-    println loginToken
-    exec {
-     commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
-    }
-  }
-}
 
 task pushDockerImage(type: DockerPushImage){
 
