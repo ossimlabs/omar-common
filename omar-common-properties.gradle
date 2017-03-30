@@ -92,7 +92,6 @@ task createDockerfile(type: Dockerfile)//, dependsOn: loadBaseDockerImage){
 
   destFile = project.file('build/libs/Dockerfile')
   from "${project.dockerNamespaceUrl}${project.ext.baseImage}:${project.dockerAppTag}"
-//  from "${project.ext.baseImage}:${dockerAppTag}"
   maintainer "DigitalGlobe-RadiantBlue"
   runCommand 'useradd omar'
   copyFile jarName, "/home/omar"
