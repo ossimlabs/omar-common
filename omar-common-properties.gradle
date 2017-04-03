@@ -222,6 +222,7 @@ task doAll() {
 artifactory {
   contextUrl = "${artifactoryContextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
   publish {
+    dependsOn "assemble"
     repository {
       repoKey = "omar-local"
       username = "${artifactoryUser}"
