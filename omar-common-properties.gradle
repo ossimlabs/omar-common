@@ -190,6 +190,7 @@ task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsO
 }
 
 task doAll() {
+  dependsOn assemble
   dependsOn dockerImageToS3
   dependsOn dockerFileToS3
 
