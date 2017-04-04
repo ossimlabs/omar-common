@@ -138,7 +138,7 @@ task createDockerfile(type: Dockerfile){
   maintainer "DigitalGlobe-RadiantBlue"
   environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
   environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
-  instruction "exposePort ${ports}"
+  instruction "expose ${ports}"
   if(!runAsRoot)
   {
     runCommand 'useradd omar'
