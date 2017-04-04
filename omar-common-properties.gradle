@@ -53,10 +53,10 @@ ext {
   openShiftUrl="https://openshift-master.ossim.io:8443"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
   dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
-
+  ports=project.ext.has("ports")?project.ext.ports:"8080"
   dockerRegistryUrl="docker-registry-default.ossim.io"
   registryProjectName="o2"
-
+  runAsRoot=project.ext.has('runAsRoot')?project.ext.runAsRoot:false
   openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
   openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
 
@@ -136,14 +136,22 @@ task createDockerfile(type: Dockerfile){
   from "${project.dockerNamespaceUrl}${project.ext.baseImage}:${project.dockerAppTag}"
 //  from "${project.ext.baseImage}:${dockerAppTag}"
   maintainer "DigitalGlobe-RadiantBlue"
-  runCommand 'useradd omar'
-  copyFile jarName, "/home/omar"
-  user 'omar'
-  workingDir '/home/omar'
   environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
   environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
-  exposePort 8080
-  defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
+  instruction "exposePort ${ports}"
+  if(!runAsRoot)
+  {
+    runCommand 'useradd omar'
+    copyFile jarName, "/home/omar"
+    user 'omar'
+    workingDir '/home/omar'  
+  }
+  else
+  {
+    copyFile jarName, "/root/"
+    workingDir '/root'  
+  }
+    defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
 }
 
 task buildDockerImage(type: DockerBuildImage) {
