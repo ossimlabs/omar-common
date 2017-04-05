@@ -103,13 +103,10 @@ ext {
   openShiftUrl="https://openshift-master.ossim.io:8443"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
   dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
-  ports=project.ext.has("ports")?project.ext.ports:"8080"
   dockerRegistryUrl="docker-registry-default.ossim.io"
   registryProjectName="o2"
-  runAsRoot=project.ext.has('runAsRoot')?project.ext.runAsRoot:false
   openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
   openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
-  enableSpringCloud=project.ext.has("enableSpringCloud")?project.ext.enableSpringCloud:true
   dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
 
   image = "${project.name}:${dockerAppTag}"
@@ -165,7 +162,7 @@ task logIn () {
 
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = 'o2-delivery/dev/docker'
-  key = "${project.ext.baseImage}.tgz"
+  key = "${lazyExtProperty('baseImage')}.tgz"
   saveTo = file("build/libs/${project.ext.baseImage}.tgz")
 }
 
@@ -173,7 +170,7 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 
   doLast {
     exec {
-      commandLine 'docker', 'load', '-i', "build/libs/${project.ext.baseImage}.tgz"
+      commandLine 'docker', 'load', '-i', "build/libs/${lazyExtProperty('baseImage')}.tgz"
     }
   }
 }
@@ -182,6 +179,7 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 task createDockerfile(type: Dockerfile){
 
   def statementOverride = lazyExtProperty("dockerStatementsOverride");
+  def ports = lazyExtProperty("ports");
 
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
 
@@ -195,7 +193,7 @@ task createDockerfile(type: Dockerfile){
   }
   else
   {
-    from "${project.dockerNamespaceUrl}${project.ext.baseImage}:${project.dockerAppTag}"
+    from "${lazyProperty('dockerNamespaceUrl')}${lazyExtProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
     maintainer "DigitalGlobe-RadiantBlue"
     environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
     environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
