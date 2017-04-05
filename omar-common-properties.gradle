@@ -179,7 +179,6 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 task createDockerfile(type: Dockerfile){
 
   def statementOverride = lazyExtProperty("dockerStatementsOverride");
-  def ports = lazyExtProperty("ports");
 
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
 
@@ -197,7 +196,7 @@ task createDockerfile(type: Dockerfile){
     maintainer "DigitalGlobe-RadiantBlue"
     environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
     environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
-    instruction "expose ${ports}"
+    instruction "expose 8080"
     runCommand 'useradd omar'
     copyFile jarName, "/home/omar"
     user 'omar'
