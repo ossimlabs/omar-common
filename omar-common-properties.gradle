@@ -29,37 +29,20 @@ apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 
-def lazyExtProperty(final String propertyName) {
-    // Get property.
-    def result
-    if(project.has(propertyName))
-    {
-      def propertyValue = project."${propertyName}"
-   
-      // Check for type of property to see if we can
-      // run it as a Closure.
-      if (propertyValue instanceof Closure) 
-      {
-          // Invoke Closure to calculate the value.
-          result = propertyValue()
-      } 
-      else 
-      { 
-          // Return value as-is.
-          result = propertyValue
-      }
-    
-    }
-    result
-}
-
 def lazyProperty(final String propertyName) {
     // Get property.
     def result
-    if(project.has(propertyName))
+    def propertyValue
+    if(project.ext.has(propertyName))
     {
-      def propertyValue = project."${propertyName}"
-   
+      propertyValue = project.ext."${propertyName}"
+    }
+    else if(project.has(proeprtyName))
+    {
+      propertyValue = project.ext."${propertyName}"
+    }
+    if(propertyValue)
+    {
       // Check for type of property to see if we can
       // run it as a Closure.
       if (propertyValue instanceof Closure) 
@@ -162,7 +145,7 @@ task logIn () {
 
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = 'o2-delivery/dev/docker'
-  key = "${lazyExtProperty('baseImage')}.tgz"
+  key = "${lazyProperty('baseImage')}.tgz"
   saveTo = file("build/libs/${project.ext.baseImage}.tgz")
 }
 
@@ -170,7 +153,7 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 
   doLast {
     exec {
-      commandLine 'docker', 'load', '-i', "build/libs/${lazyExtProperty('baseImage')}.tgz"
+      commandLine 'docker', 'load', '-i', "build/libs/${lazyProperty('baseImage')}.tgz"
     }
   }
 }
@@ -178,7 +161,7 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 //task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage){
 task createDockerfile(type: Dockerfile){
 
-  def statementOverride = lazyExtProperty("dockerStatementsOverride");
+  def statementOverride = lazyProperty("dockerStatementsOverride");
 
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
 
@@ -192,7 +175,7 @@ task createDockerfile(type: Dockerfile){
   }
   else
   {
-    from "${lazyProperty('dockerNamespaceUrl')}${lazyExtProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
+    from "${lazyProperty('dockerNamespaceUrl')}${lazyProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
     maintainer "DigitalGlobe-RadiantBlue"
     environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
     environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
