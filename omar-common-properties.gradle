@@ -59,7 +59,7 @@ ext {
   runAsRoot=project.ext.has('runAsRoot')?project.ext.runAsRoot:false
   openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
   openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
-
+  enableSpringCloud=project.ext.has("enableSpringCloud")?project.ext.enableSpringCloud:true
   dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
 
   image = "${project.name}:${dockerAppTag}"
@@ -134,10 +134,12 @@ task createDockerfile(type: Dockerfile){
 
   destFile = project.file('build/libs/Dockerfile')
   from "${project.dockerNamespaceUrl}${project.ext.baseImage}:${project.dockerAppTag}"
-//  from "${project.ext.baseImage}:${dockerAppTag}"
   maintainer "DigitalGlobe-RadiantBlue"
-  environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
-  environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
+  if(enableSpringCloud)
+  {
+    environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
+    environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
+  }
   instruction "expose ${ports}"
   if(!runAsRoot)
   {
@@ -151,7 +153,7 @@ task createDockerfile(type: Dockerfile){
     copyFile jarName, "/root/"
     workingDir '/root'  
   }
-    defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
+  defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
 }
 
 task buildDockerImage(type: DockerBuildImage) {
