@@ -144,7 +144,7 @@ task logIn () {
 
 
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
-  bucket = 'o2-delivery/dev/docker'
+  bucket = "o2-delivery/${gitBranch}/docker"
   key = "${lazyProperty('baseImage')}.tgz"
   saveTo = file("build/libs/${project.ext.baseImage}.tgz")
 }
@@ -219,18 +219,27 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 
 // Uses the S3 plugin to push the .tgz file to the ossimlabs
 task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
-  bucket = 'o2-delivery/dev/docker'
+  bucket = "o2-delivery/${gitBranch}/docker"
   key = "${imageTgz}"
   file = project.file("build/libs/${imageTgz}").toString()
 }
 
 task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: createDockerfile) {
-  bucket = 'o2-delivery/dev/docker'
+  bucket = "o2-delivery/${gitBranch}/docker"
   key = "${project.name}-Dockerfile"
   file = createDockerfile.destFile.toString()
 }
 
+task jarFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask) {
+  def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
+
+  bucket = "o2-delivery/${gitBranch}/jars"
+  key = "${jarName}"
+  file = "build/libs/${jarName}"
+}
+
 task doAll() {
+  dependsOn jarFileToS3
   dependsOn dockerImageToS3
   dependsOn dockerFileToS3
 
@@ -283,3 +292,4 @@ artifactory {
   }
 }
 artifactoryPublish.dependsOn.add("assemble")
+jarFileToS3.dependsOn.add("assemble")
