@@ -164,8 +164,8 @@ task createDockerfile(type: Dockerfile){
   def statementOverride = lazyProperty("dockerStatementsOverride");
 
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
-
-  destFile = project.file('build/libs/Dockerfile')
+  destFile = lazyProperty('dockerFile')
+  if(!destFile) destFile = project.file('build/libs/Dockerfile')
 
   if(statementOverride)
   {
