@@ -107,6 +107,12 @@ else
 {
   dockerFile = project.file(dockerFile)
 }
+
+Boolean hasJar = lazyProperty('hasJar')
+if(hasJar == null)
+{
+  hasJar = true
+}
 version "${buildVersion}-${buildVersionTag}"
 
 task logIn () {
@@ -287,7 +293,7 @@ artifactory {
 }
 artifactoryPublish.dependsOn.add("assemble")
 jarFileToS3.dependsOn.add("assemble")
-if( new File("${project.name}-${buildVersion}-${buildVersionTag}.jar").exists())
+if( hasJar )
 {
   doAll.dependsOn.add("jarFileToS3")
 }
