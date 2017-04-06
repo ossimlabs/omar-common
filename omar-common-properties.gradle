@@ -98,6 +98,15 @@ ext {
   installOssim = true
 }
 
+def dockerFile = lazyProperty('dockerFile')
+if(!dockerFile)
+{ 
+  dockerFile = project.file('build/libs/Dockerfile')
+}
+else 
+{
+  dockerFile = project.file(dockerFile)
+}
 version "${buildVersion}-${buildVersionTag}"
 
 task logIn () {
@@ -146,14 +155,14 @@ task logIn () {
 task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
   bucket = "o2-delivery/${gitBranch}/docker"
   key = "${lazyProperty('baseImage')}.tgz"
-  saveTo = file("build/libs/${project.ext.baseImage}.tgz")
+  saveTo = file("${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz")
 }
 
 task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 
   doLast {
     exec {
-      commandLine 'docker', 'load', '-i', "build/libs/${lazyProperty('baseImage')}.tgz"
+      commandLine 'docker', 'load', '-i', "${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz"
     }
   }
 }
@@ -164,8 +173,7 @@ task createDockerfile(type: Dockerfile){
   def statementOverride = lazyProperty("dockerStatementsOverride");
 
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
-  destFile = lazyProperty('dockerFile')
-  if(!destFile) destFile = project.file('build/libs/Dockerfile')
+  destFile = dockerFile
 
   if(statementOverride)
   {
@@ -212,7 +220,7 @@ task pushDockerImage(type: DockerPushImage){
 task saveDockerImage(dependsOn: pushDockerImage) {
   doLast {
     exec {
-      commandLine 'docker', 'save', image, '-o', "build/libs/${project.name}.tgz"
+      commandLine 'docker', 'save', image, '-o', "${dockerFile.parentFile}/${project.name}.tgz"
     }
   }
 }
@@ -221,7 +229,7 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
   bucket = "o2-delivery/${gitBranch}/docker"
   key = "${imageTgz}"
-  file = project.file("build/libs/${imageTgz}").toString()
+  file = ("${dockerFile.parentFile}/${imageTgz}").toString()
 }
 
 task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: createDockerfile) {
@@ -252,18 +260,6 @@ task doAll() {
       // from the local Docker registry
       commandLine 'docker', 'rmi', "-f", image
     }
-//    exec {
-//      // Removes the 'o2-base' image used during the build process
-//      commandLine 'docker', 'rmi', "-f", project.ext.baseImage
-//    }
-//    exec {
-//      // Removes the zipped image that was pushed to S3
-//      commandLine 'rm', "build/libs/${imageTgz}"
-//    }
-//    exec {
-//      // Removes the base image zip file
-//      commandLine 'rm', "build/libs/${project.ext.baseImage}.tgz"
-//    }
   }
 }
 
