@@ -232,14 +232,12 @@ task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsO
 
 task jarFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask) {
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
-
   bucket = "o2-delivery/${gitBranch}/jars"
   key = "${jarName}"
   file = "build/libs/${jarName}"
 }
 
 task doAll() {
-  dependsOn jarFileToS3
   dependsOn dockerImageToS3
   dependsOn dockerFileToS3
 
@@ -293,3 +291,8 @@ artifactory {
 }
 artifactoryPublish.dependsOn.add("assemble")
 jarFileToS3.dependsOn.add("assemble")
+if( new File("${project.name}-${buildVersion}-${buildVersionTag}.jar").exists())
+{
+  doAll.dependsOn.add("jarFileToS3")
+}
+
