@@ -98,6 +98,16 @@ ext {
   installOssim = true
 }
 
+Boolean fullAssemble = lazyProperty('fullAssemble')
+if(fullAssemble == null)
+{
+  String projName = "${project.name}"
+  fullAssemble = true;
+  if(projName.contains("-plugin"))
+  {
+    fullAssemble = false
+  }
+}
 def dockerFile = lazyProperty('dockerFile')
 if(!dockerFile)
 { 
@@ -158,7 +168,7 @@ task logIn () {
 }
 
 
-task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask, dependsOn: 'assemble') {
+task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask) {
   bucket = "o2-delivery/${gitBranch}/docker"
   key = "${lazyProperty('baseImage')}.tgz"
   saveTo = file("${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz")
@@ -291,8 +301,12 @@ artifactory {
     }
   }
 }
-artifactoryPublish.dependsOn.add("assemble")
-jarFileToS3.dependsOn.add("assemble")
+if(fullAssemble)
+{
+  artifactoryPublish.dependsOn.add("assemble")
+  jarFileToS3.dependsOn.add("assemble")
+}
+
 if( hasJar )
 {
   doAll.dependsOn.add("jarFileToS3")
