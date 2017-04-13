@@ -37,7 +37,7 @@ def lazyProperty(final String propertyName) {
     {
       propertyValue = project.ext."${propertyName}"
     }
-    else if(project.has(propertyName))
+    else if(project.hasProperty(propertyName))
     {
       propertyValue = project.ext."${propertyName}"
     }
@@ -45,13 +45,13 @@ def lazyProperty(final String propertyName) {
     {
       // Check for type of property to see if we can
       // run it as a Closure.
-      if (propertyValue instanceof Closure) 
+      if (propertyValue instanceof Closure)
       {
           // Invoke Closure to calculate the value.
           result = propertyValue()
-      } 
-      else 
-      { 
+      }
+      else
+      {
           // Return value as-is.
           result = propertyValue
       }
@@ -110,10 +110,10 @@ if(fullAssemble == null)
 }
 def dockerFile = lazyProperty('dockerFile')
 if(!dockerFile)
-{ 
+{
   dockerFile = project.file('build/libs/Dockerfile')
 }
-else 
+else
 {
   dockerFile = project.file(dockerFile)
 }
@@ -207,14 +207,14 @@ task createDockerfile(type: Dockerfile){
     runCommand 'useradd omar'
     copyFile jarName, "/home/omar"
     user 'omar'
-    workingDir '/home/omar'  
+    workingDir '/home/omar'
     defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
   }
 }
 
 task buildDockerImage(type: DockerBuildImage) {
   dependsOn createDockerfile
-  dependsOn logIn 
+  dependsOn logIn
   inputDir = createDockerfile.destFile.parentFile
   tag = "${image}"
 }
@@ -229,7 +229,7 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
 task pushDockerImage(type: DockerPushImage){
 
   dependsOn tagDockerImage
-  
+
   imageName "${dockerNamespaceUrl}${image}"
 }
 
@@ -311,4 +311,3 @@ if( hasJar )
 {
   doAll.dependsOn.add("jarFileToS3")
 }
-
