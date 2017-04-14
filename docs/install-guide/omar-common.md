@@ -15,9 +15,7 @@ In this document we will address the following:
 
 The current binary delivery for all the OMAR web applications is via a yum repository.  You can download a tgz of the yum repo hierarchy and setup a local yum repo by downloading either of the following:
 
-* [https://s3.amazonaws.com/o2-rpms/CentOS/6/master/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/6/master/rpms.tgz)
 * [https://s3.amazonaws.com/o2-rpms/CentOS/7/master/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/7/master/rpms.tgz)
-* [https://s3.amazonaws.com/o2-rpms/CentOS/6/dev/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/6/dev/rpms.tgz)
 * [https://s3.amazonaws.com/o2-rpms/CentOS/7/dev/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/7/dev/rpms.tgz)
 
 The rpms.tgz will extract to a local directory structure of the form:
