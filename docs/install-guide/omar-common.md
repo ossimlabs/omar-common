@@ -621,21 +621,3 @@ You can also install an RPM called ***haveged***.  For RPM based systems you can
 yum install haveged
 chkconfig haveged on
 ```
-
-
-# Web Service Configuration
-
-We have seen the common settings found on all of the Web Application Services.  In this section please follow the specific configuration for each web application.  The documentation will assume that the common settings have been applied and will not be repeated.  We will show all files/directories required to run the web service.
-
-* [Twofishes Installation and setup](twofishes.md) Is not managed by us but is a dependency for the omar-app UI for location services.
-* [SQS Installation and setup](sqs-app.md)
-* [AVRO Installation and setup](avro-app.md)
-* [Download Installation and setup](download-app.md)
-* [WMTS Installation and setup](wmts-app.md)
-* [WMS Installation and setup](wms-app.md)
-* [WFS Installation and setup](wfs-app.md)
-* [Swipe Installation and setup](swipe-app.md)
-* [Stager Installation and setup](stager-app.md)
-* [Super Overlay Installation and setup](superoverlay-app.md)
-* [JPIP Installation and setup](jpip-app.md)
-* [JPIP Streaming Server Installation and setup](jpip-server.md) We will add the docs to the O2 distribution but this is a C++ daemon that streams data via the JPIP protocol and is a dependency for the jpip-app
