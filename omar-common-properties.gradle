@@ -204,10 +204,14 @@ task createDockerfile(type: Dockerfile){
     environmentVariable "SPRING_CLOUD_CONFIG_ENABLED","true"
     environmentVariable "SPRING_CLOUD_DISCOVERY_ENABLED","true"
     instruction "expose 8080"
-    runCommand 'useradd omar'
-    copyFile jarName, "/home/omar"
-    user 'omar'
-    workingDir '/home/omar'
+    runCommand 'mkdir /usr/share/omar'
+    copyFile jarName, '/usr/share/omar'
+    runCommand 'chown -R 1001:0 /usr/share/omar'
+    runCommand 'chown 1001:0 /usr/share/omar'
+    runCommand 'chmod -R g+rw /usr/share/omar'
+    runCommand 'find $HOME -type d -exec chmod g+x {} +'
+    user '1001'
+    workingDir '/usr/share/omar'
     defaultCommand 'java', '-server', '-Xms256m', '-Xmx1024m', '-Djava.awt.headless=true', '-XX:+CMSClassUnloadingEnabled', '-XX:+UseGCOverheadLimit', '-Djava.security.egd=file:/dev/./urandom', '-jar', jarName
   }
 }
