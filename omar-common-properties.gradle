@@ -79,7 +79,13 @@ def gitBranch=getCurrentGitBranch()
 
 ext {
   buildVersionTag=gitBranch=="dev"?"SNAPSHOT":"RELEASE"//"SNAPSHOT" // SNAPSHOT or RELEASE
-  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
+//  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
+
+  // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild 
+  // all the time even for Patches made to master we need the changing flag to be true.  This will always 
+  // force a check for hash.
+  //
+  jarArtifactsChanging=true
   artifactoryUser="${System.env.ARTIFACTORY_USER}"
   artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
