@@ -13,7 +13,7 @@ In this document we will address the following:
 
 # Common Settings and Configuration
 
-The current binary delivery for all the OMAR web applications is via a yum repository.  You can download a tgz of the yum repo hierarchy and setup a local yum repo by downloading either of the following:
+The ossim RPM's and depdencies can be found for both dev and master builds
 
 * [https://s3.amazonaws.com/o2-rpms/CentOS/7/master/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/7/master/rpms.tgz)
 * [https://s3.amazonaws.com/o2-rpms/CentOS/7/dev/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/7/dev/rpms.tgz)
@@ -39,29 +39,11 @@ CentOS/7/dev/x86_64/<ALL RPMS>
 where **ALL RPMS** is a place holder for the RPM list.
 
 
-If you want to use our repo on the AWS site the you can create a repo file in your /etc/yum.repos.d/ossim.repo directory location.  
+If you want to use our repo on the AWS site then you can create a repo file in your /etc/yum.repos.d/ossim.repo directory location.  
 
 ```bash
 sudo vi /etc/yum.repos.d/ossim.repo
 ```
-
-##JAI Setup
-
-We have supplied the JAI files that can be added to your ext directory of the JVM version you are running
-
-* [jai_core-1.1.3.jar](http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_core-1.1.3.jar)
-* [jai_codec-1.1.3.jar](http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_codec-1.1.3.jar)
-* [jai_imageio-1.1.jar](http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_imageio-1.1.jar)
-
-If you have access to the public site we execute the following for JVM instances when configuring the OMAR/O2 services and place each jar into the proper jvm/java/jre/lib/ext directory:
-
-```
-curl -L http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_core-1.1.3.jar -o /usr/lib/jvm/java/jre/lib/ext/jai_core-1.1.3.jar
-curl -L http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_codec-1.1.3.jar -o /usr/lib/jvm/java/jre/lib/ext/jai_codec-1.1.3.jar
-curl -L http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_imageio-1.1.jar -o /usr/lib/jvm/java/jre/lib/ext/jai_imageio-1.1.jar
-```
-
-**Note:** Please modifiy the curl download script above for your JAVA installation.  At the time of writing this document we are using OpenJDK version 8.  The O2 services should already have the JAI embedded within the "Fat Jar".
 
 ##Create Yum Repo
 
@@ -79,7 +61,7 @@ Note, in the above **baseurl** variable we have different branches that you can 
 
 When going through the installation for the common services there will be some services that will access imagery directly and might need more rpm's installed to handle more types of data.  We allow these additional/optional installations to be up to the site.   Here is a list of other plugins and RPMS that can be added to any of the service installations:
 
-Here is a current listing of all the ossim and o2 RPMS that are in the REPO:
+Here is a current listing of all the ossim RPMS that are in the REPO:
 
 * **ossim-devel** Development files for ossim
 * **ossim-libs** Development files for ossim
@@ -108,32 +90,31 @@ Here is a current listing of all the ossim and o2 RPMS that are in the REPO:
 * **ossim-jpip-server** ossim kakadu jpip server
 * **ossim-geocell** Desktop electronic light table
 
-O2 RPM list from the yum repo:
 
-* **o2-jpip-app** JPIP Services
-* **o2-omar-app** OMAR/O2 UI application.
-* **o2-stager-app** Stager service for the O2 raster database Service
-* **o2-superoverlay-app** KML Superoverlay service for the O2 raster database Service
-* **o2-swipe-app** Swipe Services
-* **o2-wfs-app** OMAR/O2 WFS Service
-* **o2-wms-app** OMAR/O2 WMS Service
-* **o2-wmts-app** WMTS Services
-* **o2-sqs-app** SQS Reader Services
-* **o2-avro-app** AVRO Payload ingest for NITF avro schema
-* **o2-download-app** Takes multiple images or image groups specified in a JSON and return a zip archive
-* **o2-mensa-app** Takes image points and the image file associated with those image points and do different forms of measurements.
+##JAI Setup
+
+We have supplied the JAI files that can be added to your ext directory of the JVM version you are running
+
+* [jai_core-1.1.3.jar](http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_core-1.1.3.jar)
+* [jai_codec-1.1.3.jar](http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_codec-1.1.3.jar)
+* [jai_imageio-1.1.jar](http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_imageio-1.1.jar)
+
+If you have access to the public site we execute the following for JVM instances when configuring the OMAR/O2 services and place each jar into the proper jvm/java/jre/lib/ext directory:
+
+```
+curl -L http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_core-1.1.3.jar -o /usr/lib/jvm/java/jre/lib/ext/jai_core-1.1.3.jar
+curl -L http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_codec-1.1.3.jar -o /usr/lib/jvm/java/jre/lib/ext/jai_codec-1.1.3.jar
+curl -L http://s3.amazonaws.com/ossimlabs/dependencies/jai/jai_imageio-1.1.jar -o /usr/lib/jvm/java/jre/lib/ext/jai_imageio-1.1.jar
+```
+
+**Note:** Please modifiy the curl download script above for your JAVA installation.  At the time of writing this document we are using OpenJDK version 8.  The O2 services should already have the JAI embedded within the "Fat Jar".
+
 
 ##Setup EPEL
 
 The [Epel](https://fedoraproject.org/wiki/EPEL) site has links to the EL6, EL7, and EL5 RPM repo installations via RPMs.   We have tested the [EL6 RPM](https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm) with the CentOS 6 distribution and [EL7 RPM](https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm) with the CentOS 7 distribution.
 
-If you need to install epel manually you can install the RPM by using yum command for EL6:
-
-```bash
-yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-```
-
-and for EL7:
+If you need to install epel manually you can install the RPM by using yum command for EL7:
 
 ```bash
 yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -141,7 +122,7 @@ yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.r
 
 ##Firewall Settings Using iptables
 
-By default the web applicaiton will come up and listen on port 8080.  Typically we will add the port to the iptables setting to open TCP on port 8080:
+By default the web applicaiton will come up and listen on port 8080.  If you are running on a OS your created and not via a Docker image you might want to adjust your iptables to open port 8080 unless you have a proxy:
 
 ```bash
 sudo vi /etc/sysconfig/iptables
@@ -198,7 +179,7 @@ sudo systemctl restart firewalld
 
 ### SELINUX Configuration
 
-If SELINUX is running you must enable the boolean flag
+If SELINUX is running you are installing on an OS and not a docker then you must enable the boolean flag
 
 **httpd\_can\_network_connect**
 
@@ -248,7 +229,7 @@ We will use our common user name "omar" and create a group with the same name.  
 adduser -r -d /usr/share/omar --no-create-home --user-group omar
 ```
 
-This account will be used for running a service with a common "omar" user name and group.
+This account will be used for running a service with a common "omar" user name and group.  If you are running in a docker then you will create a OMAR user with UID 1001 and GID 0. 
 
 ## Service Templates For init.d
 
@@ -490,28 +471,44 @@ Restart=on-abort
 
 All web application are installed under the /usr/share/omar/\<program_name> directory.
 
-## Common Server Port and Context
+## Common Config Settings
 
-All services will have a common configuration entry in their yaml file that contains an entry of the form:
+All to most services will have these common config settings.  These config settings can be copied into the services application.yml and added to any services config options.
 
 ```
+serverName: "localhost"
+serverProtocol: "http"
+
+omarDb:
+  host: 
+  port: 5432
+  name: omardb-prod
+  url: jdbc:postgresql://${omarDb.host}:${omarDb.port}/${omarDb.name}
+  driver: org.postgresql.Driver
+  dialect: 'org.hibernate.spatial.dialect.postgis.PostgisDialect'
+  username: 
+  password:
+
 server:
   contextPath:
   port: 8080
 
 ---
 grails:
-  serverURL: http://<ip>:8080/
+  serverURL:${serverProtocol}://${serverName}${server.contextPath}
   assets:
     url: http://<ip>:8080/assets/
 
 ```
 
-* **contextPath** You can specify the context path and this is added to the URL to the server.  If the context is say "O2" then to access the url root path you will need to proxy to the location \<ip>:\<port>/O2
-* **port**  Defines the port that this servcie will listen on.  Default is port 8080
-* **grails.serverURL** point to the root location of the wmts-app server. The example goes directly to the service via 8080.  If a proxy is used then you must add the proxy end point.
-* **assets url** This is the url to the assets location.  Just add the **/assets/** path to the serverURL.
-
+* **server** 
+ * **contextPath** You can specify the context path and this is added to the URL to the server.  If the context is say "O2" then to access the url root path you will need to proxy to the location \<ip>:\<port>/O2
+ * **port**  Defines the port that this servcie will listen on.  Default is port 8080
+* **serverURL** point to the root location of the wmts-app server. The example goes directly to the service via 8080.  If a proxy is used then you must add the proxy end point.
+* **assets**** This is the url to the assets location.  Just add the **/assets/** path to the serverURL.
+  * **url** This is only needed if you are going through a proxy and the context-path for the server is different when going through the proxy.
+  
+   
 ## Common Endpoints Enable/Disable
 
 All the services that start with an application yaml file definition now has top have certain endpoints enabled before you can reach them.  If you need access to the **/heatlh** endpoint then it must be enabled.  Add an entry to the applicaitons YAML file defintion for getting the health of the service.
@@ -533,19 +530,23 @@ We typically use a common database server to store any service specific table da
 environments:
   production:
     dataSource:
+      url: ${omarDb.url}
+      host: ${omarDb.host}
+      port: ${omarDb}.port
+      driverClassName: ${omarDb.driver}
+      username: ${omarDb.username}
+      password: ${omarDb.password}
+      dialect: ${omarDb.dialect}
       pooled: true
       jmxExport: true
-      driverClassName: org.postgresql.Driver
-      username: postgres
-      password:
-      dialect: 'org.hibernate.spatial.dialect.postgis.PostgisDialect'
-      url: jdbc:postgresql://<ip>:<port>/omardb-prod
-
 ```
 
-* **dataSource.url** In each of the individual service documentation they will describe further where their configuration yaml file is located. The above **dataSource** defines Postgres as our connecting source and we assume a postgres instance is setup for us to connect to.  In the connection you will need to specify the **url** to connect to. The **ip** and **port** will need to be replaced with your database server instance. Postgres typically defaults to **port** 5432.
-* **dataSource.username** username for the database.
-* **dataSource.password** password for the database.
+* **dataSource**
+ * **url** In each of the individual service documentation they will describe further where their configuration yaml file is located. In the connection you will need to specify the **url** to connect to. The **ip** and **port** will need to be replaced with your database server instance. Postgres typically defaults to **port** 5432.
+ * **host** host name of the database.  This is the DNS name part without the http and paths
+ * **port** port.  For postgres this is typically 5432
+ * **username** username for the database.
+ * **password** password for the database.
 
 ## Logging
 
