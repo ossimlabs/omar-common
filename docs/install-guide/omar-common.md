@@ -223,13 +223,19 @@ sudo setsebool -P httpd_can_network_connect on
 
 ## Common User and Group
 
-We will use our common user name "omar" and create a group with the same name.  We will not create the home account and make this a system user.
+We will use our common user name "omar" and create a group with the same name.  If you are running in a docker you might want to create a home account and remove the --no-create-home and also specify a UID of 1001 and a GID of 0 for docker configurations.
 
 ```
 adduser -r -d /usr/share/omar --no-create-home --user-group omar
 ```
+Examnple for our docker creation for OpenShift deployments might look like
 
-This account will be used for running a service with a common "omar" user name and group.  If you are running in a docker then you will create a OMAR user with UID 1001 and GID 0. 
+```
+useradd -u 1001 -r -g 0 -d \$HOME -s /sbin/nologin \
+                      -c 'Default Application User' omar"
+```
+This account will be used for running a service with a common "omar" user name and group. 
+
 
 ## Service Templates For init.d
 
@@ -528,7 +534,8 @@ This will enable the endpoint .../health to be accessed and should return a JSON
 * **metrics**  Shows ‘metrics’ information for the current application.
 * **mappings** Shows the endpoint mappings for the endpoints
 * **info** Shows the version information of the service running
-* 
+* **restart** Allows one to retart a service
+* **shutdown** Allows one to shutdown a service
 
 For a complete list of endpoints please visit the spring boot page found at: [Spring Boot Endpoints](http://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html).
 ## Common Database
