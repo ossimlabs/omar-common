@@ -526,10 +526,13 @@ All the services that start with an application yaml file definition now has to 
 endpoints:
   health:
     enabled: true
+  info:
+    enabled: true
 ```
 
-This will enable the endpoint .../health to be accessed and should return a JSON formatted string describing the status of the service.  This is a common endpoint that can be enabled so a third party program can watch the service to make sure it's still alive and well.  Some other endpoints can be enabled:
+This will enable the endpoint .../health to be accessed and should return a JSON formatted string describing the status of the service.  This is a common endpoint that can be enabled so a third party program can watch the service to make sure it's still alive and well.  List of some but not all endpoints:
 
+* **health** Shows the health of the service.
 * **env** Exposes properties from Spring’s ConfigurableEnvironment.
 * **metrics**  Shows ‘metrics’ information for the current application.
 * **mappings** Shows the endpoint mappings for the endpoints
@@ -538,6 +541,7 @@ This will enable the endpoint .../health to be accessed and should return a JSON
 * **shutdown** Allows one to shutdown a service
 
 For a complete list of endpoints please visit the spring boot page found at: [Spring Boot Endpoints](http://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html).
+
 ## Common Database
 
 We typically use a common database server to store any service specific table data.  Not all services use this common setting but will be repeated in the services that use it.  Within this installation we have tested against a Postgres database server.  All services, with exception to the jpip-server that does not have an external configuration, will have a common configuration entry in their yaml file that contains an entry of the form:
