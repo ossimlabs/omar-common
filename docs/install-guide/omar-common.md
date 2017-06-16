@@ -473,7 +473,7 @@ All web application are installed under the /usr/share/omar/\<program_name> dire
 
 ## Common Config Settings
 
-All to most services will have these common config settings.  These config settings can be copied into the services application.yml and added to any services config options.
+Most services will have these common config settings.  These config settings can be copied into the services application.yml and added to any services config options.  If you are not using a config server where multiple configuration can be merged together then you must specify all your configuration in one file.  In this example we pulled from our config-server and we will setup common variables that can be used at other configuration.  We will create our own common variables and then can be used by other configurations. 
 
 ```
 serverName: "localhost"
@@ -501,17 +501,20 @@ grails:
 
 ```
 
-* **server** 
+* **serverName** Common variable that will be used to identify the server name that all requests will go through.  If you are going through a proxy then you can specify that server DNS and port if needed.
+* **serverProtocol** Common variable that will be used to identify the protocol used.  This will be either http or https 
  * **contextPath** You can specify the context path and this is added to the URL to the server.  If the context is say "O2" then to access the url root path you will need to proxy to the location \<ip>:\<port>/O2
- * **port**  Defines the port that this servcie will listen on.  Default is port 8080
+* **server**
+ * **contextPath** Each service can specify their context path if you want to add context.  The context is prefixed by any URL path endpoint. 
+ * **port**  Defines the port that this service will listen on.  Default is port 8080
 * **serverURL** point to the root location of the wmts-app server. The example goes directly to the service via 8080.  If a proxy is used then you must add the proxy end point.
-* **assets**** This is the url to the assets location.  Just add the **/assets/** path to the serverURL.
-  * **url** This is only needed if you are going through a proxy and the context-path for the server is different when going through the proxy.
+* **assets**** This is the url to the assets location.  Just add the **/assets/** path to the serverURL.  If you are going through a proxy and the proxy path is different than you service path then you must specify the asset path.  If they are the same then leave this out and do not use.
+  * **url** This is only needed if you are going through a proxy and the context-path for the server is different when going through the proxy.  Fro example, if you have a proxy path with http://[my-proxy]/path/to/service and the service path is also /path/to/service then you do not have to specify the assets.
   
    
 ## Common Endpoints Enable/Disable
 
-All the services that start with an application yaml file definition now has top have certain endpoints enabled before you can reach them.  If you need access to the **/heatlh** endpoint then it must be enabled.  Add an entry to the applicaitons YAML file defintion for getting the health of the service.
+All the services that start with an application yaml file definition now has to have certain endpoints enabled before you can reach them.  If you need access to the **/heatlh** endpoint then it must be enabled.  Add an entry to the applicaitons YAML file defintion for getting the health of the service.
 
 ```
 endpoints:
@@ -519,7 +522,13 @@ endpoints:
     enabled: true
 ```
 
-This will enable the endpoint .../health to be accessed and should return a JSON formatted string describing the status of the service.
+This will enable the endpoint .../health to be accessed and should return a JSON formatted string describing the status of the service.  This is a common endpoint that can be enabled so a third party program can watch the service to make sure it's still alive and well.  Some other endpoints can be enabled:
+
+* **env** Exposes properties from Spring’s ConfigurableEnvironment.
+* **metrics**  Shows ‘metrics’ information for the current application.
+* **mappings** Shows the endpoint mappings for the endpoints
+* **info** Shows the version information of the service running
+* 
 
 For a complete list of endpoints please visit the spring boot page found at: [Spring Boot Endpoints](http://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html).
 ## Common Database
