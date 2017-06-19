@@ -271,7 +271,7 @@ task jarFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask) {
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
   bucket = "o2-delivery/${gitBranch}/jars"
   key = "${jarName}"
-  file = "${lazyProperty('projectDir')}build/libs/${jarName}"
+  file = "${lazyProperty('projectDir')}/build/libs/${jarName}"
 }
 
 task doAll() {
