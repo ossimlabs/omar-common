@@ -39,7 +39,7 @@ def lazyProperty(final String propertyName) {
     }
     else if(project.hasProperty(propertyName))
     {
-      propertyValue = project.ext."${propertyName}"
+      propertyValue = project."${propertyName}"
     }
     if(propertyValue)
     {
