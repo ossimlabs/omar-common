@@ -317,7 +317,7 @@ artifactory {
 if(fullAssemble)
 {
   artifactoryPublish.dependsOn.add("assemble")
-  jarFileToS3.dependsOn.add("artifactoryPublish")
+  jarFileToS3.dependsOn.add("assemble")
 }
 
 if( hasJar )
