@@ -208,8 +208,8 @@ task createDockerfile(type: Dockerfile){
   {
     instruction "FROM ${lazyProperty('dockerNamespaceUrl')}${lazyProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
     instruction "MAINTAINER DigitalGlobe-RadiantBlue"
-    instruction """ ENV SPRING_CLOUD_CONFIG_ENABLED=true \\
-                        SPRING_CLOUD_DISCOVERY_ENABLED=true """
+    instruction """ENV SPRING_CLOUD_CONFIG_ENABLED=true \
+                       SPRING_CLOUD_DISCOVERY_ENABLED=true """
     instruction "expose 8080"
     instruction "RUN useradd -u 1001 -r -g 0 -d \$HOME -s /sbin/nologin \
                       -c 'Default Application User' omar &&\
