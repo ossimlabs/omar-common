@@ -221,7 +221,8 @@ task createDockerfile(type: Dockerfile){
                  find $HOME -type d -exec chmod g+x {} +'
     instruction "USER 1001"
     instruction 'WORKDIR /usr/share/omar'
-    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -Dspring.profiles.active=production -Djava.security.egd=file:/dev/./urandom -Dserver.contextPath=/omar-eureka-server -jar /usr/share/omar/${project.name}-${buildVersion}-${buildVersionTag}.jar"
+
+    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
   }
 }
 
