@@ -26,6 +26,10 @@ CentOS/<os version>/<distribution>/x86_64/<all rpms>
 
 For example, if you downloaded the RPM tgz [https://s3.amazonaws.com/o2-rpms/CentOS/7/dev/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/7/dev/rpms.tgz) and issued the command
 
+or the release:
+
+For example, if you downloaded the RPM tgz [https://s3.amazonaws.com/o2-rpms/CentOS/7/master/rpms.tgz](https://s3.amazonaws.com/o2-rpms/CentOS/7/master/rpms.tgz) and issued the command
+
 ```
 tar xvfz rpms.tgz
 ```
@@ -34,6 +38,12 @@ the directory created would be
 
 ```
 CentOS/7/dev/x86_64/<ALL RPMS>
+```
+
+and for the release
+
+```
+CentOS/7/master/x86_64/<ALL RPMS>
 ```
 
 where **ALL RPMS** is a place holder for the RPM list.
@@ -48,9 +58,20 @@ sudo vi /etc/yum.repos.d/ossim.repo
 ##Create Yum Repo
 
 ```yum
-[ossim]
+[ossim-dev]
 name=CentOS-$releasever - ossim packages for $basearch
 baseurl=http://s3.amazonaws.com/o2-rpms/CentOS/$releasever/dev/$basearch
+enabled=1
+gpgcheck=0
+metadata_expire=5m
+protect=1
+```
+Or if you want the release RPMS that do not change much until the merge of the dev then use:
+
+```yum
+[ossim-release]
+name=CentOS-$releasever - ossim packages for $basearch
+baseurl=http://s3.amazonaws.com/o2-rpms/CentOS/$releasever/master/$basearch
 enabled=1
 gpgcheck=0
 metadata_expire=5m
@@ -85,6 +106,7 @@ Here is a current listing of all the ossim RPMS that are in the REPO:
 * **ossim-png-plugin** PNG ossim plugin
 * **ossim-sqlite-plugin** OSSIM sqlite plugin, contains GeoPackage reader/writer.
 * **ossim-web-plugin** web ossim plugin
+* **ossim-aws-plugin** S3 bucket access for ossim
 * **ossim-cnes-plugin** Plugin with various sensor models
 * **ossim-potrace-plugin** potrace plugin
 * **ossim-jpip-server** ossim kakadu jpip server
@@ -116,13 +138,13 @@ The [Epel](https://fedoraproject.org/wiki/EPEL) site has links to the EL6, EL7, 
 
 If you need to install epel manually you can install the RPM by using yum command for EL7:
 
-```bash
+```
 yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 ```
 
 ##Firewall Settings Using iptables
 
-By default the web applicaiton will come up and listen on port 8080.  If you are running on a OS your created and not via a Docker image you might want to adjust your iptables to open port 8080 unless you have a proxy:
+By default the web applicaiton will come up and listen on port 8080.  If you are running on an OS you created and not via a Docker image you might want to adjust your iptables to open port 8080 unless you have a proxy:
 
 ```bash
 sudo vi /etc/sysconfig/iptables
