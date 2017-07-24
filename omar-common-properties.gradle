@@ -195,8 +195,7 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 task copyJarToDockerDir(type: Copy){
   dependsOn "jar"
   from "${buildDir}/libs/${project.name}-${buildVersion}-${buildVersionTag}.jar"
-  into {println "WHAT";
-        "${projectDir}/docker"}
+  into "${projectDir}/docker"
 }
 
 //task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage){
