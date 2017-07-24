@@ -3,6 +3,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.image.DockerTagImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
+import org.gradle.api.tasks.Copy
 
 buildscript {
     ext {
@@ -191,11 +192,17 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
   }
 }
 
+task copyJarToDockerDir(type: Copy){
+  dependsOn "jar"
+  from "${buildDir}/libs/${project.name}-${buildVersion}-${buildVersionTag}.jar"
+  into {println "WHAT";
+        "${projectDir}/docker"}
+}
+
 //task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage){
 task createDockerfile(type: Dockerfile){
 
   def statementOverride = lazyProperty("dockerStatementsOverride");
-
   def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
   destFile = dockerFile
   if(statementOverride)
@@ -324,4 +331,9 @@ if(fullAssemble)
 if( hasJar )
 {
   doAll.dependsOn.add("jarFileToS3")
+  if(lazyProperty('dockerFile'))
+  {
+     createDockerfile.dependsOn.add("copyJarToDockerDir")       
+  }
 }
+
