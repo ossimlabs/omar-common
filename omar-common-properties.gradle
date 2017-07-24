@@ -193,7 +193,6 @@ task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 }
 
 task copyJarToDockerDir(type: Copy){
-  dependsOn "jar"
   from "${buildDir}/libs/${project.name}-${buildVersion}-${buildVersionTag}.jar"
   into "${projectDir}/docker"
 }
@@ -325,6 +324,7 @@ if(fullAssemble)
 {
   artifactoryPublish.dependsOn.add("assemble")
   jarFileToS3.dependsOn.add("assemble")
+  copyJarToDockerDir.dependsOn("assemble")
 }
 
 if( hasJar )
@@ -332,7 +332,8 @@ if( hasJar )
   doAll.dependsOn.add("jarFileToS3")
   if(lazyProperty('dockerFile'))
   {
-     createDockerfile.dependsOn.add("copyJarToDockerDir")       
+     createDockerfile.dependsOn.add("copyJarToDockerDir")    
+
   }
 }
 
