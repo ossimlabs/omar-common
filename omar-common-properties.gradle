@@ -216,16 +216,16 @@ task createDockerfile(type: Dockerfile){
     instruction """ENV SPRING_CLOUD_CONFIG_ENABLED=true \\
                        SPRING_CLOUD_DISCOVERY_ENABLED=true """
     instruction "expose 8080"
-    instruction "RUN useradd -u 1001 -r -g 0 -d \$HOME -s /sbin/nologin \
-                      -c 'Default Application User' omar &&\
-                mkdir /usr/share/omar"
-    instruction "COPY ${jarName} /usr/share/omar"
-    instruction 'RUN chown -R 1001:0 /usr/share/omar &&\
-                 chown 1001:0 /usr/share/omar &&\
-                 chmod -R g+rw /usr/share/omar &&\
-                 find $HOME -type d -exec chmod g+x {} +'
-    instruction "USER 1001"
-    instruction 'WORKDIR /usr/share/omar'
+    //instruction "RUN useradd -u 1001 -r -g 0 -d \$HOME -s /sbin/nologin \
+    //                  -c 'Default Application User' omar &&\
+    //            mkdir /usr/share/omar"
+    instruction "COPY ${jarName} /home/omar"
+    //instruction 'RUN chown -R 1001:0 /usr/share/omar &&\
+    //             chown 1001:0 /usr/share/omar &&\
+    //             chmod -R g+rw /usr/share/omar &&\
+    //             find $HOME -type d -exec chmod g+x {} +'
+    //instruction "USER 1001"
+    instruction 'WORKDIR /home/omar'
 
     instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
   }
