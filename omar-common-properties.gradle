@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Copy
 
 buildscript {
     ext {
-        artifactoryContextUrl="https://artifacts.radiantbluecloud.com/artifactory"
+        artifactoryContextUrl="https://artifactory.ossim.io/artifactory"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
     }
     repositories {
