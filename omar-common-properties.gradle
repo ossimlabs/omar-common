@@ -23,16 +23,14 @@ buildscript {
         classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
         classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
    }
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
-
-plugins {
-    id "org.sonarqube" version "2.2"
-}
+apply plugin: "org.sonarqube"
 
 def lazyProperty(final String propertyName) {
     // Get property.
