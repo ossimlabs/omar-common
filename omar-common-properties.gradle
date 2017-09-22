@@ -30,7 +30,9 @@ buildscript {
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
-apply plugin: "org.sonarqube"
+plugins {
+    id "org.sonarqube" version "2.5"
+}
 
 def lazyProperty(final String propertyName) {
     // Get property.
