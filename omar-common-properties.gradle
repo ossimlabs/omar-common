@@ -228,7 +228,7 @@ task createDockerfile(type: Dockerfile){
     //instruction "USER 1001"
     instruction 'WORKDIR /home/omar'
 
-    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
+    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -XX:+UnlockExperimentalVMOptions  -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
   }
 }
 
@@ -246,11 +246,18 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
 }
 
 
-task pushDockerImage(type: DockerPushImage){
-
+task pushDockerImage(/*type: DockerPushImage*/){
+  dependsOn tagDockerImage
+  doLast {
+    exec {
+      commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
+    }
+  }
+/*
   dependsOn tagDockerImage
 
   imageName "${dockerNamespaceUrl}${image}"
+*/
 }
 
 task saveDockerImage(dependsOn: pushDockerImage) {
@@ -333,7 +340,6 @@ if( hasJar )
   doAll.dependsOn.add("jarFileToS3")
   if(lazyProperty('dockerFile'))
   {
-     createDockerfile.dependsOn.add("copyJarToDockerDir")    
-
+     createDockerfile.dependsOn.add("copyJarToDockerDir")
   }
 }
