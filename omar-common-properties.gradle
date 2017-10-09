@@ -4,15 +4,15 @@ import com.bmuschko.gradle.docker.tasks.image.DockerTagImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 import org.gradle.api.tasks.Copy
-
 buildscript {
     ext {
-        artifactoryContextUrl="https://artifacts.radiantbluecloud.com/artifactory"
+        artifactoryContextUrl="https://artifacts.ossim.io/artifactory"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
     }
     repositories {
 
      mavenLocal()
+
      maven { url "${ossimMavenProxy}" }
       jcenter()
       maven {
@@ -67,6 +67,7 @@ def lazyProperty(final String propertyName) {
 def getCurrentGitBranch() {
     def gitBranch = "Unknown branch"
     try {
+      println "${project.projectDir}"
         def workingDir = new File("${project.projectDir}")
         def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
         result.waitFor()
