@@ -6,7 +6,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 import org.gradle.api.tasks.Copy
 buildscript {
     ext {
-        artifactoryContextUrl="https://artifacts.ossim.io/artifactory"
+        artifactoryContextUrl="https://artifactory.ossim.io/artifactory"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
     }
     repositories {
@@ -23,12 +23,17 @@ buildscript {
         classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
         classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
    }
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
+
+repositories {
+  maven { url "https://dl.bintray.com/ajay-kumar/plugins" }  
+}
 
 def lazyProperty(final String propertyName) {
     // Get property.
@@ -228,7 +233,7 @@ task createDockerfile(type: Dockerfile){
     //instruction "USER 1001"
     instruction 'WORKDIR /home/omar'
 
-    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
+    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -XX:+UnlockExperimentalVMOptions  -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
   }
 }
 
@@ -246,11 +251,18 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
 }
 
 
-task pushDockerImage(type: DockerPushImage){
-
+task pushDockerImage(/*type: DockerPushImage*/){
+  dependsOn tagDockerImage
+  doLast {
+    exec {
+      commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
+    }
+  }
+/*
   dependsOn tagDockerImage
 
   imageName "${dockerNamespaceUrl}${image}"
+*/
 }
 
 task saveDockerImage(dependsOn: pushDockerImage) {
@@ -333,8 +345,6 @@ if( hasJar )
   doAll.dependsOn.add("jarFileToS3")
   if(lazyProperty('dockerFile'))
   {
-     createDockerfile.dependsOn.add("copyJarToDockerDir")    
-
+     createDockerfile.dependsOn.add("copyJarToDockerDir")
   }
 }
-
