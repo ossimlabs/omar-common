@@ -31,6 +31,10 @@ apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 
+repositories {
+  maven { url "https://dl.bintray.com/ajay-kumar/plugins" }  
+}
+
 def lazyProperty(final String propertyName) {
     // Get property.
     def result
