@@ -13,6 +13,10 @@ It is dependent upon two external Gradle plugins to aid in some of the tasks.  T
 
 [Gradle S3 Plugin](https://github.com/skhatri/gradle-s3-plugin)
 
+[Gradle Artifactory Plugin](https://www.jfrog.com/confluence/display/RTF/Gradle+Artifactory+Plugin)
+
+[Gradle SonarQube Plugin](https://plugins.gradle.org/plugin/org.sonarqube)
+
 ##### Installation
 
 You will need to modify your shell environment to point to the location of the .gradle file.
