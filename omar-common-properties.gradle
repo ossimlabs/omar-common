@@ -30,6 +30,16 @@ buildscript {
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
+apply plugin: org.sonarqube.gradle.SonarQubePlugin
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "${rootProject.name}"
+        property "sonar.projectKey", "${rootProject.name}"
+        property "sonar.host.url", "http://sonarqube.ossim.io"
+        property "sonar.login", System.env.SONARQUBE_TOKEN
+    }
+}
 
 repositories {
  // maven { url "${ossimMavenProxy}" }
