@@ -256,7 +256,7 @@ Examnple for our docker creation for OpenShift deployments might look like
 useradd -u 1001 -r -g 0 -d \$HOME -s /sbin/nologin \
                       -c 'Default Application User' omar"
 ```
-This account will be used for running a service with a common "omar" user name and group. 
+This account will be used for running a service with a common "omar" user name and group.
 
 
 ## Service Templates For init.d
@@ -501,20 +501,20 @@ All web application are installed under the /usr/share/omar/\<program_name> dire
 
 ## Common Config Settings
 
-Most services will have these common config settings.  These config settings can be copied into the services application.yml and added to any services config options.  If you are not using a config server where multiple configuration can be merged together then you must specify all your configuration in one file.  In this example we pulled from our config-server and we will setup common variables that can be used at other configuration.  We will create our own common variables and then can be used by other configurations. 
+Most services will have these common config settings.  These config settings can be copied into the services application.yml and added to any services config options.  If you are not using a config server where multiple configuration can be merged together then you must specify all your configuration in one file.  In this example we pulled from our config-server and we will setup common variables that can be used at other configuration.  We will create our own common variables and then can be used by other configurations.
 
 ```
 serverName: "localhost"
 serverProtocol: "http"
 
 omarDb:
-  host: 
+  host:
   port: 5432
   name: omardb-prod
   url: jdbc:postgresql://${omarDb.host}:${omarDb.port}/${omarDb.name}
   driver: org.postgresql.Driver
   dialect: 'org.hibernate.spatial.dialect.postgis.PostgisDialect'
-  username: 
+  username:
   password:
 
 server:
@@ -527,29 +527,67 @@ grails:
   assets:
     url: http://<ip>:8080/assets/
 
+---
+
+# These settings are optional and only used with Spring Boot Admin application
+spring:
+  boot:
+    admin:
+      url: http://<ip>:<port>/<context>/
+      auto-deregistration: true
+      client:
+        prefer-ip: true
+
 ```
 
 * **serverName** Common variable that will be used to identify the server name that all requests will go through.  If you are going through a proxy then you can specify that server DNS and port if needed.
-* **serverProtocol** Common variable that will be used to identify the protocol used.  This will be either http or https 
+* **serverProtocol** Common variable that will be used to identify the protocol used.  This will be either http or https
  * **contextPath** You can specify the context path and this is added to the URL to the server.  If the context is say "O2" then to access the url root path you will need to proxy to the location \<ip>:\<port>/O2
 * **server**
- * **contextPath** Each service can specify their context path if you want to add context.  The context is prefixed by any URL path endpoint. 
+ * **contextPath** Each service can specify their context path if you want to add context.  The context is prefixed by any URL path endpoint.
  * **port**  Defines the port that this service will listen on.  Default is port 8080
 * **serverURL** point to the root location of the wmts-app server. The example goes directly to the service via 8080.  If a proxy is used then you must add the proxy end point.
 * **assets**** This is the url to the assets location.  Just add the **/assets/** path to the serverURL.  If you are going through a proxy and the proxy path is different than you service path then you must specify the asset path.  If they are the same then leave this out and do not use.
   * **url** This is only needed if you are going through a proxy and the context-path for the server is different when going through the proxy.  Fro example, if you have a proxy path with http://[my-proxy]/path/to/service and the service path is also /path/to/service then you do not have to specify the assets.
-  
-   
-## Common Endpoints Enable/Disable
 
-All the services that start with an application yaml file definition now has to have certain endpoints enabled before you can reach them.  If you need access to the **/heatlh** endpoint then it must be enabled.  Add an entry to the applicaitons YAML file defintion for getting the health of the service.
+##### Spring Boot Admin
+
+The following settings are _optional_. They are only used in conjunction with the  [Spring Boot Admin](http://codecentric.github.io/spring-boot-admin/1.5.4/#_what_is_spring_boot_admin) server.  The O2 applications have the [Spring Boot Admin Client](http://codecentric.github.io/spring-boot-admin/1.5.4/#register-clients-via-spring-boot-admin) included, and are used to allow the SBA client and SBA server to communicate.
+
+OMAR Spring Boot Admin documentation is located [here](../../../omar-admin-server/docs/install-guide/omar-admin-server/).
+
+Note: You will also need to utilize the common endpoints configuration settings in the following section (Common Endpoints Settings).
+
+* **spring**
+  * **admin**
+    * **url** URL of the Spring Boot Admin Server
+    * **auto-degristration** Switch to enable auto-deregistration at Spring Boot Admin server when context is closed. (Default is false)
+    * **client**
+      * **prefer-ip** Use the ip-address rather then the hostname in the guessed urls. If server.address / management.address is set, it get used. Otherwise the IP address returned from InetAddress.getLocalHost() gets used.
+
+## Common Endpoints Settings (Enable/Disable)
+
+All the services that start with an application yaml file definition now has to have certain endpoints enabled before you can reach them.  If you need access to the **/heatlh** endpoint then it must be enabled.  Add an entry to the applicaitons YAML file defintion for getting the health of the service.  These settings are used for the Spring Boot Admin, and the Actuator.w
 
 ```
 endpoints:
+  enabled: true
   health:
     enabled: true
-  info:
-    enabled: true
+  actuator:
+    sensitive: false
+  beans:
+    sensitive: false
+  metrics:
+    sensitive: false
+  configprops:
+    sensitive: false
+  trace:
+    sensitive: false
+  mappings:
+    sensitive: false
+  env:
+    sensitive: false
 ```
 
 This will enable the endpoint .../health to be accessed and should return a JSON formatted string describing the status of the service.  This is a common endpoint that can be enabled so a third party program can watch the service to make sure it's still alive and well.  List of some but not all endpoints:
