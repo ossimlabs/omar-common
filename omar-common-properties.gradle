@@ -268,8 +268,8 @@ task pushDockerImage(/*type: DockerPushImage*/){
 task saveDockerImage(dependsOn: pushDockerImage) {
   doLast {
     exec {
-      commandLine 'docker', 'save', image, '-o', "${dockerFile.parentFile}/${project.name}.tgz"
-      //commandLine 'gzip', "-c", "${dockerFile.parentFile}/${project.name} > ${dockerFile.parentFile}/${project.name}.tgz"
+      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}"
+      commandLine 'gzip', "-c", ">", "${dockerFile.parentFile}/${project.name}.tgz"
     }
   }
 }
