@@ -259,8 +259,8 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 
   doLast {
     exec {
-      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}"
-      commandLine 'gzip', "-S", ".tgz", "${dockerFile.parentFile}/${project.name}"
+      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.t"
+      commandLine 'gzip', "-S", "gz", "${dockerFile.parentFile}/${project.name}.t"
     }
   }
 }
