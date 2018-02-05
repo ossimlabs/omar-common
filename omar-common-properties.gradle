@@ -256,6 +256,7 @@ task pushDockerImage(/*type: DockerPushImage*/){
 }
 
 task saveDockerImage(dependsOn: pushDockerImage) {
+
   doLast {
     exec {
       commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}"
