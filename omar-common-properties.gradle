@@ -259,10 +259,13 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 
   doLast {
     exec {
-      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.t"
+      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.tar"
     }
     exec {
-      commandLine 'gzip', "-f","-S", "gz", "${dockerFile.parentFile}/${project.name}.t"
+      commandLine 'gzip', "-f","-S", ".gz", "${dockerFile.parentFile}/${project.name}.tar"
+    }
+    exec {
+      commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
     }
   }
 }
