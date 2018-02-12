@@ -98,7 +98,7 @@ ext {
   artifactoryUser="${System.env.ARTIFACTORY_USER}"
   artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
-  openShiftUrl="https://openshift-master.ossim.io:8443"
+  openShiftUrl="${System.env.OPENSHIFT_URL}"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
   dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
   dockerRegistryUrl="docker-registry-default.ossim.io"
