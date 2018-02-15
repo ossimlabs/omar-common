@@ -168,6 +168,11 @@ task logIn () {
       }
     }
 
+    println "Switching to project: ${ registryProjectName }"
+    exec {
+      commandLine 'oc', 'project', registryProjectName
+    }
+
     def loginTokenStream = new ByteArrayOutputStream()
     exec {
       commandLine 'oc', 'whoami', '-t'
