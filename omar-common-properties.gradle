@@ -22,7 +22,7 @@ buildscript {
 	elImplV = "2.2.1-b05"
 	seleniumHtmlUnitDriverV = "2.52.0"
 	htmlUnitV = "2.29"
-	javaSdkDynamodbV = "1.11.277"
+	javaSdkDynamodbV = "1.11.279"
 	springDataDynamodbV = "5.0.1"
 	gradleDockerPluginV = "3.2.4"
 	jodaTimeV = "2.9.9"
@@ -32,6 +32,11 @@ buildscript {
 	hibernate5V = "6.1.8"
 	httpBuilderNgCoreV = "1.0.3"
 	quartzV = "2.0.13"
+	httpBuilderV = "0.7.2"
+	awsJavaSDKV = "1.11.279"
+	commonsIoV = "2.6"
+	springSecurityCoreV = "3.3.0.M1"
+	npmCesiumV = "1.42.1"
     }
     repositories {
 
