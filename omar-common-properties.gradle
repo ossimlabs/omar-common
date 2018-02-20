@@ -35,7 +35,7 @@ buildscript {
 	httpBuilderNgCoreV = "1.0.3"
 	quartzV = "2.0.13"
 	httpBuilderV = "0.7.2"
-	awsJavaSDKV = "1.11.279"
+	awsJavaSDKV = "1.11.281"
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
 	npmCesiumV = "1.42.1"
