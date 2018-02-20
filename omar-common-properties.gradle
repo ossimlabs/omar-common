@@ -6,6 +6,8 @@ import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 import org.gradle.api.tasks.Copy
 buildscript {
     ext {
+        springBootV = "1.5.10.RELEASE"
+	springCloudDependencyV = "Dalston.SR5"
         artifactoryContextUrl="https://artifactory.ossim.io/artifactory"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
 	benManesV = "0.17.0"
