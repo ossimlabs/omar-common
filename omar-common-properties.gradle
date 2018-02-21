@@ -129,7 +129,7 @@ buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
   artifactoryUser="${System.env.ARTIFACTORY_USER}"
   artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
-  openShiftUrl = "${System.env.OPENSHIFT_URL}"
+  openShiftUrl = "${System.env.DOCKER_REGISTRY_URL}"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
   dockerAppTag="${System.env.DOCKER_TAG}"
   dockerRegistryUrl="${System.env.OPENSHIFT_URL}"
