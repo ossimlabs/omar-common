@@ -44,7 +44,7 @@ buildscript {
     repositories {
 
      mavenLocal()
-
+     
      maven { url "${ossimMavenProxy}" }
       jcenter()
       maven {
