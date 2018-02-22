@@ -38,13 +38,13 @@ buildscript {
 	awsJavaSDKV = "1.11.281"
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
-	npmCesiumV = "1.42.1"
+  npmCesiumV = "1.38.0"
 	hibernateEhcacheV = "5.3.0.CR1"
     }
     repositories {
 
      mavenLocal()
-     
+
      maven { url "${ossimMavenProxy}" }
       jcenter()
       maven {
@@ -119,7 +119,7 @@ def getCurrentGitBranch() {
 def gitBranch=getCurrentGitBranch()
 
 ext {
-  buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"//"SNAPSHOT" // SNAPSHOT or RELEASE
+buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
 //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
 
   // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild
@@ -130,11 +130,11 @@ ext {
   artifactoryUser="${System.env.ARTIFACTORY_USER}"
   artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
-  openShiftUrl="https://openshift-master.ossim.io:8443"
+  openShiftUrl = "${System.env.OPENSHIFT_URL}"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
-  dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
-  dockerRegistryUrl="docker-registry-default.ossim.io"
-  registryProjectName="openshift"
+  dockerAppTag="${System.env.DOCKER_TAG}"
+  dockerRegistryUrl="${System.env.DOCKER_REGISTRY_URL}"
+  registryProjectName="${System.env.REGISTRY_PROJECT_NAME}"
   openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
   openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
   dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
