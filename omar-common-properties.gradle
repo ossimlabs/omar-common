@@ -201,10 +201,11 @@ task checkVersionStatus() {
 }
 
 def doFinalVersionCommit() {
-   withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'ossimlabs-minion',
-                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+   node {
+   withCredentials([usernamePassword(credentialsId: 'ossimlabs-minion',
+                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
 
-   println "USERNAME: ${env.USERNAME} PASSWORD: ${env.PASSWORD}"
+   println "USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
    def String projectRoot = project.rootDir
    def String projectDir = project.projectDir
    def String retval
@@ -280,6 +281,7 @@ def doFinalVersionCommit() {
          println "==============PUSH FAILED > ${serr}"
          }
       }
+   }
    }
    }
 }
