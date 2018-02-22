@@ -184,8 +184,6 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
-   println "<<<<<<<<<<<<<<<<<<<<<<<< ${GITUSER}"
-
    // Call the radiantblue plugin that checks if anything was committed since last time
    dependsOn updateTheVersion
    doLast {
