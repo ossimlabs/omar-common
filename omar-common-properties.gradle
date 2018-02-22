@@ -220,6 +220,10 @@ def doFinalVersionCommit() {
    configProc.consumeProcessOutput(sout, serr)
    configProc.waitFor()
 
+   configProc = "git config --global push.default simple".execute()
+   configProc.consumeProcessOutput(sout, serr)
+   configProc.waitFor()
+
    while (!isDone) {
       sout = new StringBuilder()
       serr = new StringBuilder()
@@ -266,7 +270,7 @@ def doFinalVersionCommit() {
             println "==============Push was successful"
          }
          else {
-         println "==============PULL FAILED > ${serr}"
+         println "==============PUSH FAILED > ${serr}"
          }
       }
    }
