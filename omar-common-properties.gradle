@@ -205,7 +205,8 @@ def doFinalVersionCommit() {
                     //usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
    //println "USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
 
-   println "<<<<<<<<<<<<<<<<CREDENTIALS: ${GIT_CREDENTIALS}"
+   println "<<<<<<<<<<<<<<<<REGISTRY_PROJECT_NAME: ${REGISTRY_PROJECT_NAME}"
+   //println "<<<<<<<<<<<<<<<<CREDENTIALS: ${GIT_CREDENTIALS}"
 
    def String projectRoot = project.rootDir
    def String projectDir = project.projectDir
