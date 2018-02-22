@@ -201,7 +201,6 @@ task checkVersionStatus() {
 }
 
 def doFinalVersionCommit() {
-   node {
    withCredentials([usernamePassword(credentialsId: 'ossimlabs-minion',
                     usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
 
@@ -281,7 +280,6 @@ def doFinalVersionCommit() {
          println "==============PUSH FAILED > ${serr}"
          }
       }
-   }
    }
    }
 }
