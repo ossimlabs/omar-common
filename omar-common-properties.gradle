@@ -187,7 +187,7 @@ task checkVersionStatus() {
    withCredentials([[$class: 'usernamePassword',
       credentialsId: 'ossimlabs-minion',
       usernameVariable: 'USERNAME', 
-      passwordVariable: 'PASSWORD')]) {
+      passwordVariable: 'PASSWORD']]) {
 
       println "1111111111111111 USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
    }
