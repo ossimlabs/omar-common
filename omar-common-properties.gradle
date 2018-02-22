@@ -38,7 +38,7 @@ buildscript {
 	awsJavaSDKV = "1.11.281"
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
-	npmCesiumV = "1.42.1"
+	npmCesiumV = "1.38.0"
     }
     repositories {
 
