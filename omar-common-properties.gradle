@@ -389,9 +389,10 @@ task jarFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask) {
 
 task doAll() {
   dependsOn checkVersionStatus
-  dependsOn dockerImageToS3
-  dependsOn dockerFileToS3
+  //dependsOn dockerImageToS3
+  //dependsOn dockerFileToS3
 
+/*
   doLast{
     exec {
       // Removes the image that is pushed to the remote repository
@@ -404,6 +405,7 @@ task doAll() {
       commandLine 'docker', 'rmi', "-f", image
     }
   }
+*/
 }
 
 artifactory {
