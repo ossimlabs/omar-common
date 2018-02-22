@@ -184,7 +184,10 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
-   println "1111111111111<<<<<<<<<<<<<<<< ${System.env.GIT_CREDENTIALS}"
+   withCredentials([usernamePassword(credentialsId: 'ossimlabs-minion',
+                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+      println "USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
+   }
 
    // Call the radiantblue plugin that checks if anything was committed since last time
    dependsOn updateTheVersion
