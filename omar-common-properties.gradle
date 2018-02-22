@@ -40,7 +40,7 @@ buildscript {
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
 	npmCesiumV = "1.42.1"
-        branchToVersionCheck="marktest"
+        branchToVersionCheck="OCS-2628"
     }
     repositories {
 
