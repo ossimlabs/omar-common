@@ -184,6 +184,7 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
+   println "1111111111111<<<<<<<<<<<<<<<<REGISTRY_PROJECT_NAME: ${REGISTRY_PROJECT_NAME}"
    // Call the radiantblue plugin that checks if anything was committed since last time
    dependsOn updateTheVersion
    doLast {
@@ -204,8 +205,6 @@ def doFinalVersionCommit() {
    //withCredentials([usernamePassword(credentialsId: 'ossimlabs-minion',
                     //usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
    //println "USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
-
-   println "<<<<<<<<<<<<<<<<REGISTRY_PROJECT_NAME: ${REGISTRY_PROJECT_NAME}"
    //println "<<<<<<<<<<<<<<<<CREDENTIALS: ${GIT_CREDENTIALS}"
 
    def String projectRoot = project.rootDir
