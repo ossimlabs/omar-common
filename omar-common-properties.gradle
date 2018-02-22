@@ -209,18 +209,20 @@ def doFinalVersionCommit() {
    def String 
    boolean isDone = false
 
+   def sout = new StringBuilder(), serr = new StringBuilder()
+
+   // We need to have a git identity for this commit and subsequent push
+   def configProc = "git config user.name jenkins".execute()
+   configProc.consumeProcessOutput(sout, serr)
+   configProc.waitFor()
+
+   configProc = "git config user.email jenkins@radiantsolutions.com".execute()
+   configProc.consumeProcessOutput(sout, serr)
+   configProc.waitFor()
+
    while (!isDone) {
-      def sout = new StringBuilder(), serr = new StringBuilder()
-
-      // We need to have a git identity for this commit and subsequent push
-      def configProc = "git config user.name jenkins".execute()
-      configProc.consumeProcessOutput(sout, serr)
-      configProc.waitFor()
-
-      configProc = "git config user.email jenkins@radiantsolutions.com".execute()
-      configProc.consumeProcessOutput(sout, serr)
-      configProc.waitFor()
-
+      sout = new StringBuilder()
+      serr = new StringBuilder()
       // Build the git commit process and execute it for this repo
       def commitProc = "git --git-dir=${projectRoot}/.git commit -m RELEASE_UPDATE".execute()
       commitProc.consumeProcessOutput(sout, serr)
@@ -253,12 +255,18 @@ def doFinalVersionCommit() {
          println "==============Commit was successful >  ${sout}"
          isDone = true
 
-         def pushProc = "git push".execute()
+         sout = new StringBuilder()
+         serr = new StringBuilder()
+
+         def pushProc = "git --git-dir=${projectRoot}/.git push".execute()
          pushProc.consumeProcessOutput(sout, serr)
          pushProc.waitFor()
 
          if (serr == null || serr.size() == 0) {
             println "==============Push was successful"
+         }
+         else {
+         println "==============PULL FAILED > ${serr}"
          }
       }
    }
