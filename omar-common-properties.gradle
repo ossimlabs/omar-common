@@ -4,6 +4,11 @@ import com.bmuschko.gradle.docker.tasks.image.DockerTagImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 import org.gradle.api.tasks.Copy
+
+environment {
+  GITUSER = credentials('ossimlabs-minion')
+}
+
 buildscript {
     ext {
         springBootV = "1.5.10.RELEASE"
@@ -183,6 +188,8 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
+   println "<<<<<<<<<<<<<<<<<<<<<<<< ${GITUSER}"
+
    // Call the radiantblue plugin that checks if anything was committed since last time
    dependsOn updateTheVersion
    doLast {
