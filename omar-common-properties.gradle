@@ -201,10 +201,12 @@ task checkVersionStatus() {
 }
 
 def doFinalVersionCommit() {
-   withCredentials([usernamePassword(credentialsId: 'ossimlabs-minion',
-                    usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+   //withCredentials([usernamePassword(credentialsId: 'ossimlabs-minion',
+                    //usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+   //println "USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
 
-   println "USERNAME: ${USERNAME} PASSWORD: ${PASSWORD}"
+   println "<<<<<<<<<<<<<<<<CREDENTIALS: ${GIT_CREDENTIALS}"
+
    def String projectRoot = project.rootDir
    def String projectDir = project.projectDir
    def String retval
@@ -281,7 +283,7 @@ def doFinalVersionCommit() {
          }
       }
    }
-   }
+   //}
 }
 
 task logIn () {
