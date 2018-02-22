@@ -262,8 +262,8 @@ def doFinalVersionCommit() {
          sout = new StringBuilder()
          serr = new StringBuilder()
 
-         //def pushProc = "git --git-dir=${projectRoot}/.git --set-upstream origin ${branchToVersionCheck} push".execute()
-         def pushProc = "git --git-dir=${projectRoot}/.git push".execute()
+         def pushProc = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}".execute()
+         //def pushProc = "git --git-dir=${projectRoot}/.git push".execute()
          pushProc.consumeProcessOutput(sout, serr)
          pushProc.waitFor()
 
