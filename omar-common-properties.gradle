@@ -218,6 +218,7 @@ def doFinalVersionCommit() {
       //   git. If serr is non-zero, that is the case and we should try to wait for the lock file to
       //   get cleaned up.
       if (serr != null && serr.size() > 0) {
+         println "==============Commit FAILED > ${serr}"
          // A simple loop to wait for the git lock file to get cleaned up. Include the failsafe of
          // maximum attempts to wait for the lock
          def filename = "${projectRoot}/.git/index.lock"
@@ -237,6 +238,7 @@ def doFinalVersionCommit() {
          }
       }
       else {
+         println "==============Commit was successful >  ${sout}"
          isDone = true
       }
    }
