@@ -205,9 +205,21 @@ def doFinalVersionCommit() {
    def String retval
 
    println "+++++++ doFinalVersionCommit: Attempting commit on repo " + projectRoot
+
+   def String 
    boolean isDone = false
    while (!isDone) {
       def sout = new StringBuilder(), serr = new StringBuilder()
+
+      def configProc = "git config user.name jenkins".execute()
+      configProc.consumeProcessOutput(sout, serr)
+      configProc.waitFor()
+println "111111111111111111111111111 > ${serr}"
+
+      configProc = "git config user.email jenkins@radiantsolutions.com".execute()
+      configProc.consumeProcessOutput(sout, serr)
+      configProc.waitFor()
+println "222222222222222222222222222 > ${serr}"
 
       // Build the git commit process and execute it for this repo
       def commitProc = "git --git-dir=${projectRoot}/.git commit -m RELEASE_UPDATE".execute()
