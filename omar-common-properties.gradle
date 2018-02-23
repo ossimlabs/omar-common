@@ -279,14 +279,18 @@ def doFinalVersionCommit() {
          sout = new StringBuilder()
          serr = new StringBuilder()
 
-         String mystr = "git push https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/"
+         def myproj = new File(project.rootDir)
+         String projname = myproj.getName()
+
+         String mystr = "git push https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git""
 
          String pushStr = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}"
 println "PUSHSTR: ${pushStr}"
 println "mYSTR: ${mystr}"
 
-         def pushProc = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}".execute()
+         //def pushProc = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}".execute()
          //def pushProc = "git --git-dir=${projectRoot}/.git push".execute()
+         def pushProc = "${mystr}".execute()
          pushProc.consumeProcessOutput(sout, serr)
          pushProc.waitFor()
 
