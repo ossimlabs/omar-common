@@ -6,8 +6,40 @@ import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 import org.gradle.api.tasks.Copy
 buildscript {
     ext {
+        springBootV = "1.5.10.RELEASE"
+	springCloudDependencyV = "Dalston.SR5"
         artifactoryContextUrl="https://artifactory.ossim.io/artifactory"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
+	benManesV = "0.17.0"
+	assetPipelineGradleV = "2.14.8"
+	assetPipelineGrailsV = "2.14.8"
+	springBootAdminStarterClientV = "1.5.7"
+	bootstrapSelectV = "2.0.0-beta1"
+	slickCarouselV = "1.8.1"
+	angularSlickCarouselV = "3.1.7"
+	selectizeV = "0.12.4"
+	seiyriaBootstrapSliderV = "9.7.2"
+	babelAssetPipelineV = "2.1.1"
+	hibernateCoreV = "5.1.9.Final"
+	elImplV = "2.2.1-b05"
+	seleniumHtmlUnitDriverV = "2.52.0"
+	htmlUnitV = "2.29"
+	javaSdkDynamodbV = "1.11.279"
+	springDataDynamodbV = "5.0.1"
+	gradleDockerPluginV = "3.2.4"
+	jodaTimeV = "2.9.9"
+	webjarsSwaggerUIV = "3.9.3"
+	postgressqlV = "42.2.1"
+	hibernateSpatialV = "5.3.0.CR1"
+	hibernate5V = "6.1.8"
+	httpBuilderNgCoreV = "1.0.3"
+	quartzV = "2.0.13"
+	httpBuilderV = "0.7.2"
+	awsJavaSDKV = "1.11.281"
+	commonsIoV = "2.6"
+	springSecurityCoreV = "3.3.0.M1"
+  npmCesiumV = "1.38.0"
+	hibernateEhcacheV = "5.3.0.CR1"
     }
     repositories {
 
@@ -87,7 +119,7 @@ def getCurrentGitBranch() {
 def gitBranch=getCurrentGitBranch()
 
 ext {
-  buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"//"SNAPSHOT" // SNAPSHOT or RELEASE
+buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
 //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
 
   // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild
@@ -98,11 +130,11 @@ ext {
   artifactoryUser="${System.env.ARTIFACTORY_USER}"
   artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
 
-  openShiftUrl="https://openshift-master.ossim.io:8443"
+  openShiftUrl = "${System.env.OPENSHIFT_URL}"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
-  dockerAppTag=(buildVersionTag=="SNAPSHOT"?"latest":"release")
-  dockerRegistryUrl="docker-registry-default.ossim.io"
-  registryProjectName="openshift"
+  dockerAppTag="${System.env.DOCKER_TAG}"
+  dockerRegistryUrl="${System.env.DOCKER_REGISTRY_URL}"
+  registryProjectName="${System.env.REGISTRY_PROJECT_NAME}"
   openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
   openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
   dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
@@ -219,7 +251,7 @@ task createDockerfile(type: Dockerfile){
   {
     instruction "FROM ${lazyProperty('dockerNamespaceUrl')}${lazyProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
     instruction """ENV SPRING_CLOUD_CONFIG_ENABLED=true \\
-                       SPRING_CLOUD_DISCOVERY_ENABLED=true"""
+    SPRING_CLOUD_DISCOVERY_ENABLED=true"""
     instruction "EXPOSE 8080"
     instruction "COPY ${jarName} /home/omar"
     instruction 'WORKDIR /home/omar'
@@ -256,7 +288,6 @@ task pushDockerImage(/*type: DockerPushImage*/){
 }
 
 task saveDockerImage(dependsOn: pushDockerImage) {
-
   doLast {
     exec {
       commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.tar"
