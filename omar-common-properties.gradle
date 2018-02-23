@@ -184,16 +184,7 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
-/*
-   withCredentials([[$class: 'usernamePassword',
-      credentialsId: 'ossimlabs-minion',
-      usernameVariable: 'USERNAME', 
-      passwordVariable: 'PASSWORD']]) {
-*/
-
-      //println "1111111111111111 USERNAME: ${System.env.GIT_USER} PASSWORD: ${System.env.GIT_PASSWORD}"
-//}
-
+   println "in checkVersionStatus for ${project.projectDir}"
    // Call the radiantblue plugin that checks if anything was committed since last time
    dependsOn updateTheVersion
    doLast {
@@ -229,11 +220,11 @@ def doFinalVersionCommit() {
    def sout = new StringBuilder(), serr = new StringBuilder()
 
    // We need to have a git identity for this commit and subsequent push
-   def configProc = "git config user.name ossimlabs-minion".execute()
+   def configProc = "git config user.name omarossim".execute()
    configProc.consumeProcessOutput(sout, serr)
    configProc.waitFor()
 
-   configProc = "git config user.email ossimlabs-minion@radiantsolutions.com".execute()
+   configProc = "git config user.email omarossim@radiantsolutions.com".execute()
    configProc.consumeProcessOutput(sout, serr)
    configProc.waitFor()
 
@@ -276,6 +267,7 @@ def doFinalVersionCommit() {
          println "==============Commit was successful >  ${sout}"
          isDone = true
 
+         // Reset
          sout = new StringBuilder()
          serr = new StringBuilder()
 
@@ -283,23 +275,14 @@ def doFinalVersionCommit() {
          String projname = myproj.getName()
 
          String mystr = "git --git-dir=${projectRoot}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
-         //String mystr = "git --git-dir=${projectRoot}.git push --set-upstream origin ${branchToVersionCheck}"
 
-         //String pushStr = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}"
-println "-----------------------> PUSHSTR: ${mystr}"
+         println "-----------------------> PUSHSTR: ${mystr}"
 
-         //def pushProc = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}".execute()
-         //def pushProc = "git --git-dir=${projectRoot}/.git push".execute()
          def pushProc = "${mystr}".execute()
          pushProc.consumeProcessOutput(sout, serr)
          pushProc.waitFor()
 
-         if (serr == null || serr.size() == 0) {
-            println "==============Push was successful"
-         }
-         else {
-         println "==============PUSH FAILED > ${serr}"
-         }
+         println "==============Push results: serr > ${serr} sout > ${sout}"
       }
    }
    //}
