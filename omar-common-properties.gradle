@@ -229,11 +229,11 @@ def doFinalVersionCommit() {
    def sout = new StringBuilder(), serr = new StringBuilder()
 
    // We need to have a git identity for this commit and subsequent push
-   def configProc = "git config user.name jenkins".execute()
+   def configProc = "git config user.name ossimlabs-minion".execute()
    configProc.consumeProcessOutput(sout, serr)
    configProc.waitFor()
 
-   configProc = "git config user.email jenkins@radiantsolutions.com".execute()
+   configProc = "git config user.email ossimlabs-minion@radiantsolutions.com".execute()
    configProc.consumeProcessOutput(sout, serr)
    configProc.waitFor()
 
@@ -282,7 +282,8 @@ def doFinalVersionCommit() {
          def myproj = new File("${project.rootDir}")
          String projname = myproj.getName()
 
-         String mystr = "git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
+         //String mystr = "git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
+         String mystr = "cd ${projectRoot};git push "
 
          //String pushStr = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}"
 println "PUSHSTR: ${mystr}"
