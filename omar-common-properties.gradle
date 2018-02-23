@@ -245,7 +245,7 @@ def doFinalVersionCommit() {
       sout = new StringBuilder()
       serr = new StringBuilder()
       // Build the git commit process and execute it for this repo
-      def commitProc = "git --git-dir=${projectRoot}.git commit -m RELEASE_UPDATE".execute()
+      def commitProc = "git --git-dir=${projectRoot}/.git commit -m RELEASE_UPDATE".execute()
       commitProc.consumeProcessOutput(sout, serr)
       commitProc.waitFor()
 
@@ -282,7 +282,7 @@ def doFinalVersionCommit() {
          def myproj = new File("${project.rootDir}")
          String projname = myproj.getName()
 
-         String mystr = "git push --git-dir=${projectRoot}.git --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
+         String mystr = "git push --git-dir=${projectRoot}/.git --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
          //String mystr = "git --git-dir=${projectRoot}.git push --set-upstream origin ${branchToVersionCheck}"
 
          //String pushStr = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}"
