@@ -283,7 +283,7 @@ def doFinalVersionCommit() {
          String projname = myproj.getName()
 
          //String mystr = "git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
-         String mystr = "cd ${projectRoot};git push "
+         String mystr = "git push"
 
          //String pushStr = "git --git-dir=${projectRoot}/.git push --set-upstream origin ${branchToVersionCheck}"
 println "PUSHSTR: ${mystr}"
