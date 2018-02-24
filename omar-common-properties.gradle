@@ -41,7 +41,10 @@ buildscript {
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
 	npmCesiumV = "1.42.1"
-        branchToVersionCheck="OCS-2628"
+        // External vars specific to version updating
+        versionBranchToCheck="OCS-2628"
+        //versionPathSplitToken=""
+        versionPathSplitToken="workspace"
     }
     repositories {
 
@@ -60,7 +63,7 @@ buildscript {
       classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
       classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
       classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
-      classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.4"
+      classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.5"
    }
 }
 
@@ -270,7 +273,7 @@ def doFinalVersionCommit() {
          def myproj = new File("${project.rootDir}")
          String projname = myproj.getName()
 
-         String mystr = "git --git-dir=${projectRoot}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${branchToVersionCheck}"
+         String mystr = "git --git-dir=${projectRoot}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projname}.git ${versionBranchToCheck}"
 
          println "-----------------------> PUSHSTR: ${mystr}"
 
