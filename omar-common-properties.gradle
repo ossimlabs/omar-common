@@ -51,8 +51,8 @@ buildscript {
      mavenLocal()
 
      maven { url "${ossimMavenProxy}" }
-     //maven { url "${omarMavenProxy}" }
-     maven { url "file://Users/mkrutz/OTD/gradle-maven-core" }
+     maven { url "${omarMavenProxy}" }
+     //maven { url "file://Users/mkrutz/OTD/gradle-maven-core" }
       jcenter()
       maven {
         url "https://plugins.gradle.org/m2/"
@@ -188,7 +188,7 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
-   println "in checkVersionStatus for ${project.projectDir}"
+   println "in checkVersionStatus for '${project.projectDir}'"
    // Call the radiantblue plugin that checks if anything was committed since last time
    dependsOn updateTheVersion
    doLast {
@@ -200,7 +200,11 @@ task checkVersionStatus() {
       //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
       //println "doVersionUpdateCommit: " + project.ext.get("doVersionUpdateCommit")
       if (doVersionUpdateCommit == "true") {
+         println "++++++ Doing the doLast for '${project.projectDir}'"
          doFinalVersionCommit()
+      }
+      else {
+         println "++++++ Skipping the doLast for '${project.projectDir}'"
       }
    }
 }
@@ -208,12 +212,9 @@ task checkVersionStatus() {
 def doFinalVersionCommit() {
    def String projectRoot = project.rootDir
    def String projectDir = project.projectDir
-   def String retval
 
    println "+++++++ doFinalVersionCommit: Attempting commit on repo " + projectRoot
 
-
-   def String 
    boolean isDone = false
 
    def sout = new StringBuilder(), serr = new StringBuilder()
