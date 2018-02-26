@@ -27,10 +27,10 @@ buildscript {
 	seleniumHtmlUnitDriverV = "2.52.0"
 	htmlUnitV = "2.29"
 	javaSdkDynamodbV = "1.11.279"
-	springDataDynamodbV = "5.0.1"
+	springDataDynamodbV = "4.5.0"
 	gradleDockerPluginV = "3.2.4"
 	jodaTimeV = "2.9.9"
-	webjarsSwaggerUIV = "3.9.3"
+	webjarsSwaggerUIV = "3.10.0"
 	postgressqlV = "42.2.1"
 	hibernateSpatialV = "5.3.0.CR1"
 	hibernate5V = "6.1.8"
@@ -40,23 +40,22 @@ buildscript {
 	awsJavaSDKV = "1.11.281"
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
-	npmCesiumV = "1.42.1"
+        npmCesiumV = "1.38.0"
+	hibernateEhcacheV = "5.3.0.CR1"
         // External vars specific to version updating
         versionBranchToCheck="OCS-2628"
-        //versionPathSplitToken=""
         versionPathSplitToken="workspace"
     }
     repositories {
 
-     mavenLocal()
+       mavenLocal()
 
-     maven { url "${ossimMavenProxy}" }
-     maven { url "${omarMavenProxy}" }
-     //maven { url "file://Users/mkrutz/OTD/gradle-maven-core" }
-      jcenter()
-      maven {
-        url "https://plugins.gradle.org/m2/"
-      }
+       maven { url "${ossimMavenProxy}" }
+       maven { url "${omarMavenProxy}" }
+       jcenter()
+       maven {
+           url "https://plugins.gradle.org/m2/"
+       }
     }
     dependencies {
       classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
@@ -406,7 +405,13 @@ task pushDockerImage(/*type: DockerPushImage*/){
 task saveDockerImage(dependsOn: pushDockerImage) {
   doLast {
     exec {
-      commandLine 'docker', 'save', image, '-o', "${dockerFile.parentFile}/${project.name}.tgz"
+      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.tar"
+    }
+    exec {
+      commandLine 'gzip', "-f","-S", ".gz", "${dockerFile.parentFile}/${project.name}.tar"
+    }
+    exec {
+      commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
     }
   }
 }
