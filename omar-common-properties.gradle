@@ -4,12 +4,14 @@ import com.bmuschko.gradle.docker.tasks.image.DockerTagImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
 import org.gradle.api.tasks.Copy
+
 buildscript {
     ext {
         springBootV = "1.5.10.RELEASE"
 	springCloudDependencyV = "Dalston.SR5"
         artifactoryContextUrl="https://artifactory.ossim.io/artifactory"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
+        omarMavenProxy="${artifactoryContextUrl}/omar-local"
 	benManesV = "0.17.0"
 	assetPipelineGradleV = "2.14.8"
 	assetPipelineGrailsV = "2.14.8"
@@ -38,7 +40,7 @@ buildscript {
 	awsJavaSDKV = "1.11.281"
 	commonsIoV = "2.6"
 	springSecurityCoreV = "3.3.0.M1"
-        npmCesiumV = "1.38.0"
+  npmCesiumV = "1.38.0"
 	hibernateEhcacheV = "5.3.0.CR1"
         // External vars specific to version updating
         versionBranchToCheck="master"
@@ -46,25 +48,28 @@ buildscript {
     }
     repositories {
 
-     mavenLocal()
+       mavenLocal()
 
-     maven { url "${ossimMavenProxy}" }
-      jcenter()
-      maven {
-        url "https://plugins.gradle.org/m2/"
-      }
+       maven { url "${ossimMavenProxy}" }
+       maven { url "${omarMavenProxy}" }
+       jcenter()
+       maven {
+           url "https://plugins.gradle.org/m2/"
+       }
     }
     dependencies {
       classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
       classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
       classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
       classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
+      classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.6.6"
    }
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
+apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
 
 repositories {
  // maven { url "${ossimMavenProxy}" }
@@ -122,8 +127,14 @@ def getCurrentGitBranch() {
 def gitBranch=getCurrentGitBranch()
 
 ext {
-buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
-//  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
+  // This property is used exclusively for determining whether or not to do the final git
+  //   git commit for a version updated (or at least checked) repository. The updateTheVersion
+  //   task may change this property to false to indicate processing on the given projectRoot
+  //   should come to a stop.
+  doVersionUpdateCommit="true"
+
+  buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
+  //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
 
   // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild
   // all the time even for Patches made to master we need the changing flag to be true.  This will always
@@ -174,6 +185,107 @@ if(hasJar == null)
   hasJar = true
 }
 version "${buildVersion}-${buildVersionTag}"
+
+task checkVersionStatus() {
+   println "in checkVersionStatus for '${project.projectDir}'"
+   // Call the radiantblue plugin that checks if anything was committed since last time
+   dependsOn updateTheVersion
+   doLast {
+      // The external project property 'doVersionUpdateCommit' is defaulted to 'true'
+      //   for every project that gets funneled through this omar-common script. However,
+      //   we are ony interested in doing version updates for the correct repos for this
+      //   rootProject directory. If this script wanders into a different base repo, then
+      //   the 'updateTheVersion' task will set the 'doVersionUpdateCommit' to 'false'
+      //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
+      if (doVersionUpdateCommit == "true") {
+         doFinalVersionCommit()
+      }
+   }
+}
+
+def doFinalVersionCommit() {
+   def String projectRoot = project.rootDir
+   def String projectDir = project.projectDir
+
+   println "INFO: doFinalVersionCommit - Attempting commit/push for '${projectRoot}'"
+
+   // Setup stout and sterr
+   def sout = new StringBuilder(), serr = new StringBuilder()
+
+   //////////////////////////////////////////////////////////////////////////////
+   // GIT IDENTITY START
+   // We need to have a git identity for this commit and subsequent push
+   def configProc = "git config user.name omarossim".execute()
+   configProc.consumeProcessOutput(sout, serr)
+   configProc.waitFor()
+
+   configProc = "git config user.email omarossim@radiantsolutions.com".execute()
+   configProc.consumeProcessOutput(sout, serr)
+   configProc.waitFor()
+
+   configProc = "git config --global push.default simple".execute()
+   configProc.consumeProcessOutput(sout, serr)
+   configProc.waitFor()
+   // GIT IDENTITY END
+   //////////////////////////////////////////////////////////////////////////////
+
+   boolean isDone = false
+   while (!isDone) {
+      sout = new StringBuilder()
+      serr = new StringBuilder()
+      // Build the git commit process and execute it for this repo
+      def commitProc = "git --git-dir=${projectRoot}/.git commit -m RELEASE_UPDATE".execute()
+      commitProc.consumeProcessOutput(sout, serr)
+      commitProc.waitFor()
+
+      // Due to the timing of how these parallel build runs, we occassionaly run into a lock file for
+      //   git. If serr is non-zero, that is the case and we should try to wait for the lock file to
+      //   get cleaned up.
+      if (serr != null && serr.size() > 0) {
+         println "ERROR: Git commit FAILED > ${serr}"
+
+         // A simple loop to wait for the git lock file to get cleaned up. Include the failsafe of
+         // maximum attempts to wait for the lock
+         def filename = "${projectRoot}/.git/index.lock"
+         def lockfile = new File(filename)
+         def lockTries = 0
+         while (lockfile.exists() && ++lockTries < 10) {
+            sleep(2000)
+         }
+
+         // Prevent an infinite wait
+         if (lockTries == 10) {
+            println "WARN: lockTries exceeded for ${filename} --- git commit failed!"
+
+            // Going to eject out of outer loop after 10 attempts to wait/release the lock file
+            isDone = true
+         }
+      }
+      else {
+         isDone = true
+
+         // Reset the string builders for the git push output now
+         sout = new StringBuilder()
+         serr = new StringBuilder()
+
+         // Extract just the project name from the root directory, we need it for the git push string
+         def proj  = new File("${project.rootDir}")
+         String projName = proj.getName()
+
+         // We have to have credentials for this push. They have been set in the main jenkins
+         //   environemnt section
+         String pushString = "git --git-dir=${projectRoot}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projName}.git ${versionBranchToCheck}"
+
+         println "-----------------------> PUSHSTR: ${pushString}"
+
+         def pushProc = "${pushString}".execute()
+         pushProc.consumeProcessOutput(sout, serr)
+         pushProc.waitFor()
+
+         println "==============git push results: serr > ${serr} sout > ${sout}"
+      }
+   }
+}
 
 task logIn () {
   doLast {
@@ -325,6 +437,7 @@ task jarFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask) {
 }
 
 task doAll() {
+  dependsOn checkVersionStatus
   dependsOn dockerImageToS3
   dependsOn dockerFileToS3
 
