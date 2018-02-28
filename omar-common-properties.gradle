@@ -43,7 +43,7 @@ buildscript {
     	npmCesiumV = "1.38.0"
 	hibernateEhcacheV = "5.3.0.CR1"
         // External vars specific to version updating
-        versionBranchToCheck="master"
+        versionBranchToCheck="OCS-2628E"
         versionPathSplitToken="workspace"
     }
     repositories {
