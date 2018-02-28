@@ -8,7 +8,7 @@ buildscript {
     ext {
         springBootV = "1.5.10.RELEASE"
 	springCloudDependencyV = "Dalston.SR5"
-        artifactoryContextUrl="https://artifactory.ossim.io/artifactory"
+        artifactoryContextUrl="${System.env.ARTIFACTORY_URL}"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
 	benManesV = "0.17.0"
 	assetPipelineGradleV = "2.14.8"
