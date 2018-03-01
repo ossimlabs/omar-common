@@ -43,7 +43,7 @@ buildscript {
     	npmCesiumV = "1.38.0"
 	hibernateEhcacheV = "5.3.0.CR1"
         // External vars specific to version updating
-        versionBranchToCheck="OCS-2628E"
+        versionBranchToCheck="master"
         versionPathSplitToken="workspace"
     }
     repositories {
@@ -205,10 +205,24 @@ task checkVersionStatus() {
 }
 
 def doFinalVersionCommit() {
-   def String projectRoot = project.rootDir
-   def String projectDir = project.projectDir
+   String projectRoot = project.rootDir
+   String projectDir = project.projectDir
+   String gitRootPath
 
    println "INFO: doFinalVersionCommit - Attempting commit/push for '${projectRoot}'"
+
+   // Prepare for jenkins project kluge! The rootPath shouldn't really
+   //   contain full paths to subprojects. It should be the path to the
+   //   location of the .git directory. If this jenkins project
+   //   variable comes in this way, we need to hack it to where the
+   //   .git folder ACTUALLY lives.
+   if (projectRoot.contains("/apps/")) {
+      // Extract the base portion of this path for the REAL rootPath
+      gitRootPath = projectRoot.substring(0, projectRoot.indexOf("/apps/"))
+   }
+   else {
+      gitRootPath = project.rootDir
+   }
 
    // Setup stout and sterr
    def sout = new StringBuilder(), serr = new StringBuilder()
@@ -235,7 +249,7 @@ def doFinalVersionCommit() {
       sout = new StringBuilder()
       serr = new StringBuilder()
       // Build the git commit process and execute it for this repo
-      def commitProc = "git --git-dir=${projectRoot}/.git commit -m RELEASE_UPDATE".execute()
+      def commitProc = "git --git-dir=${gitRootPath}/.git commit -m RELEASE_UPDATE".execute()
       commitProc.consumeProcessOutput(sout, serr)
       commitProc.waitFor()
 
@@ -247,7 +261,7 @@ def doFinalVersionCommit() {
 
          // A simple loop to wait for the git lock file to get cleaned up. Include the failsafe of
          // maximum attempts to wait for the lock
-         def filename = "${projectRoot}/.git/index.lock"
+         def filename = "${gitRootPath}/.git/index.lock"
          def lockfile = new File(filename)
          def lockTries = 0
          while (lockfile.exists() && ++lockTries < 10) {
@@ -275,7 +289,7 @@ def doFinalVersionCommit() {
 
          // We have to have credentials for this push. They have been set in the main jenkins
          //   environemnt section
-         String pushString = "git --git-dir=${projectRoot}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projName}.git ${versionBranchToCheck}"
+         String pushString = "git --git-dir=${gitRootPath}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${projName}.git ${versionBranchToCheck}"
 
          println "-----------------------> PUSHSTR: ${pushString}"
 
