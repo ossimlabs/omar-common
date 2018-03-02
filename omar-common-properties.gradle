@@ -43,8 +43,10 @@ buildscript {
     	npmCesiumV = "1.38.0"
 	hibernateEhcacheV = "5.3.0.CR1"
         // External vars specific to version updating
-        versionBranchToCheck="master"
-        versionPathSplitToken="workspace"
+        //versionBranchToCheck="master"
+        versionBranchToCheck="markmaster"
+        //versionPathSplitToken="workspace"
+        versionPathSplitToken=""
     }
     repositories {
 
@@ -331,6 +333,75 @@ def doFinalVersionCommit() {
          pushProc.waitFor()
 
          println "==============git push results: serr > ${serr} sout > ${sout}"
+
+         // Reset these
+         sout = new StringBuilder()
+         serr = new StringBuilder()
+
+         def getCommitProc = "git --git-dir=${gitRootPath}/.git log --oneline -1 --format=%h:%s".execute()
+         getCommitProc.consumeProcessOutput(sout, serr)
+         getCommitProc.waitFor()
+println "serr > ${serr} sout > ***${sout}***"
+
+         // Due to the timing of how these parallel build runs, we occassionaly run into a lock file for
+         //   git. If serr is non-zero, that is the case and we should try to wait for the lock file to
+         //   get cleaned up.
+         if (serr != null && serr.size() > 0) {
+            println "ERROR: git log failed! ${serr}"
+         }
+         else {
+            String masterCommitId = "NA"
+            if (sout.length() > 0) {
+               String commitStringLog = sout.toString()
+               String []commitIdTokens = commitStringLog.split(":")
+               if (commitIdTokens[1].trim() == "RELEASE_UPDATE") {
+                  masterCommitId = commitIdTokens[0]
+               }
+            }
+            
+            if (masterCommitId != "NA") {
+println "MASTERCOMMITID ${masterCommitId}"
+               sout = new StringBuilder()
+               serr = new StringBuilder()
+
+               //def checkoutProc = "git --git-dir=${gitRootPath}/.git checkout dev".execute()
+               def checkoutProc = "git --git-dir=${gitRootPath}/.git checkout markdev".execute()
+               checkoutProc.consumeProcessOutput(sout, serr)
+               checkoutProc.waitFor()
+               //if (serr != null && serr.size() > 0) {
+                  //println "ERROR: git checkout of dev failed! ${serr}"
+               //}
+               //else {
+println "checkout from dev sout > ${sout} serr > ${serr}"
+                  sout = new StringBuilder()
+                  serr = new StringBuilder()
+                  def cherryPickProc = "git --git-dir=${gitRootPath}/.git cherry-pick ${masterCommitId}".execute()
+                  cherryPickProc.consumeProcessOutput(sout, serr)
+                  cherryPickProc.waitFor()
+                  //if (serr != null && serr.size() > 0) {
+                     //println "ERROR: git cherry-pick failed! ${serr}"
+                  //}
+                  //else {
+println "cherrypick from dev sout > ${sout} serr > ${serr}"
+                     sout = new StringBuilder()
+                     serr = new StringBuilder()
+                     //checkoutProc = "git --git-dir=${gitRootPath}/.git checkout master".execute()
+                     checkoutProc = "git --git-dir=${gitRootPath}/.git checkout markmaster".execute()
+                     checkoutProc.consumeProcessOutput(sout, serr)
+                     checkoutProc.waitFor()
+                   //  if (serr != null && serr.size() > 0) {
+                        //println "ERROR: git checkout of master failed! ${serr}"
+                     //}
+                     //else {
+println "checkout from master sout > ${sout} serr > ${serr}"
+                     //}
+                  //}
+               //}
+            }
+else {
+println "NO MASTERCOMMITID was found!"
+}
+         }
       }
    }
 }
