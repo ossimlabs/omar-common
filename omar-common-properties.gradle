@@ -223,12 +223,18 @@ def doFinalVersionCommit() {
       gitRootPath = projectRoot.substring(0, projectRoot.indexOf("/apps/"))
       String rootTmp = rootProject.substring(rootProject.indexOf("'") + 1)
 
-      String []tokens = rootProject.split("-")
-      if (tokens.size() == 2) {
-         rootProjectName = tokens[0]
+      if (rootTmp != null) {
+         String []tokens = rootTmp.split("-")
+         if (tokens.size() == 2) {
+            rootProjectName = tokens[0]
+         }
+         else {
+            println "WARNING: doFinalVersionCommit - Odd number of tokens found for '${projectRoot}'"
+            rootProjectName = project.rootProject
+         }
       }
       else {
-         println "WARNING: doFinalVersionCommit - Odd number of tokens found for '${projectRoot}'"
+         println "WARNING: doFinalVersionCommit - UNPARSEABLE rootProject found '${projectRoot}'"
          rootProjectName = project.rootProject
       }
    }
