@@ -63,7 +63,7 @@ buildscript {
       classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
       classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
       classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
-      classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.1"
+      classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.2"
    }
 }
 
@@ -248,6 +248,20 @@ def doFinalVersionCommit() {
    while (!isDone) {
       sout = new StringBuilder()
       serr = new StringBuilder()
+
+      // Do a fetch, on the off chance something else has been pushed simultaneously
+      def fetchProc = "git --git-dir=${gitRootPath}/.git fetch".execute()
+      fetchProc.consumeProcessOutput(sout, serr)
+      fetchProc.waitFor()
+      if (serr != null && serr.size() > 0) {
+         // Non fatal?
+         println "ERROR: Git fetch FAILED > ${serr}"
+      }
+
+      // Reset these
+      sout = new StringBuilder()
+      serr = new StringBuilder()
+
       // Build the git commit process and execute it for this repo
       def commitProc = "git --git-dir=${gitRootPath}/.git commit -m RELEASE_UPDATE".execute()
       commitProc.consumeProcessOutput(sout, serr)
