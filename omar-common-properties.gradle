@@ -221,7 +221,7 @@ def doFinalVersionCommit() {
    if (projectRoot.contains("/apps/")) {
       // Extract the base portion of this path for the REAL rootPath
       gitRootPath = projectRoot.substring(0, projectRoot.indexOf("/apps/"))
-      Strink []tokens = rootProject.split("-")
+      String []tokens = rootProject.split("-")
       if (tokens.size() == 2) {
          rootProjectName = tokens[0]
       }
