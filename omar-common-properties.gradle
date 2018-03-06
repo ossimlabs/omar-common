@@ -44,7 +44,7 @@ buildscript {
 	hibernateEhcacheV = "5.3.0.CR1"
 
         // External vars specific to version updating
-        versionBranchToCheck="markdev"
+        versionBranchToCheck="dev"
         versionPathSplitToken="workspace"
         vupDebug=true
     }
