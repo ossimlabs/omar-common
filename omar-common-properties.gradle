@@ -62,7 +62,7 @@ buildscript {
     dependencies {
       classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
       classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
-      classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+      classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
       classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
       classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.4"
    }
