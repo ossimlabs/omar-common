@@ -189,18 +189,20 @@ if(hasJar == null)
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
-   println "in checkVersionStatus for '${project.projectDir}'"
-   // Call the radiantblue plugin that checks if anything was committed since last time
-   dependsOn updateTheVersion
-   doLast {
-      // The external project property 'doVersionUpdateCommit' is defaulted to 'true'
-      //   for every project that gets funneled through this omar-common script. However,
-      //   we are ony interested in doing version updates for the correct repos for this
-      //   rootProject directory. If this script wanders into a different base repo, then
-      //   the 'updateTheVersion' task will set the 'doVersionUpdateCommit' to 'false'
-      //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
-      if (doVersionUpdateCommit == "true") {
-         doFinalVersionCommit()
+   if( Boolean.parseBoolean( System.env.USE_VERSION_STATUS ) ) {
+      println "in checkVersionStatus for '${project.projectDir}'"
+      // Call the radiantblue plugin that checks if anything was committed since last time
+      dependsOn updateTheVersion
+      doLast {
+         // The external project property 'doVersionUpdateCommit' is defaulted to 'true'
+         //   for every project that gets funneled through this omar-common script. However,
+         //   we are ony interested in doing version updates for the correct repos for this
+         //   rootProject directory. If this script wanders into a different base repo, then
+         //   the 'updateTheVersion' task will set the 'doVersionUpdateCommit' to 'false'
+         //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
+         if (doVersionUpdateCommit == "true") {
+            doFinalVersionCommit()
+         }
       }
    }
 }
