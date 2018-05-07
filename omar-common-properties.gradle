@@ -133,7 +133,7 @@ ext {
   //   git commit for a version updated (or at least checked) repository. The updateTheVersion
   //   task may change this property to false to indicate processing on the given projectRoot
   //   should come to a stop.
-  doVersionUpdateCommit="true"
+  doVersionUpdateCommit="false"
 
   buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
   //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
