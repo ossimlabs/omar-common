@@ -49,10 +49,10 @@ buildscript {
         vupDebug=true
     }
     repositories {
+       mavenLocal()
        maven { url "${ossimMavenProxy}" }
        maven { url "${omarMavenProxy}" }
        if( !System.env.WWW_CONNECTED || Boolean.parseBoolean( System.env.WWW_CONNECTED ) ) {
-        mavenLocal()
         jcenter()
         maven {
            url "https://plugins.gradle.org/m2/"
