@@ -72,6 +72,7 @@ apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
+apply plugin: "maven"
 
 repositories {
  // maven { url "${ossimMavenProxy}" }
@@ -559,4 +560,14 @@ if( hasJar )
   {
      createDockerfile.dependsOn.add("copyJarToDockerDir")
   }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${ System.env.REPOSITORY_MANAGER_URL }/omar-local-${ buildVersionTag.toLowerCase() }") {
+                authentication( userName: "${ System.env.REPOSITORY_MANAGER_USER }", password: "${ System.env.REPOSITORY_MANAGER_PASSWORD }" )
+            }
+        }
+    }
 }
