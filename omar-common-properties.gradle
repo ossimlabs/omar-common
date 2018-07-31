@@ -9,7 +9,7 @@ buildscript {
     ext {
         springBootV = "1.5.10.RELEASE"
 	springCloudDependencyV = "Dalston.SR5"
-        artifactoryContextUrl="${System.env.ARTIFACTORY_URL}"
+        artifactoryContextUrl="${System.env.REPOSITORY_MANAGER_URL}"
         ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
         omarMavenProxy="${artifactoryContextUrl}/omar-local"
 	benManesV = "0.17.0"
@@ -64,14 +64,14 @@ buildscript {
       classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
       classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
       classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
-      classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.4"
+      //classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.4"
    }
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
 apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
-apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
+//apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
 apply plugin: "maven"
 
 repositories {
@@ -144,8 +144,8 @@ ext {
   // force a check for hash.
   //
   jarArtifactsChanging=true
-  artifactoryUser="${System.env.ARTIFACTORY_USER}"
-  artifactoryPassword="${System.env.ARTIFACTORY_PASSWORD}"
+  artifactoryUser="${System.env.REPOSITORY_MANAGER_USER}"
+  artifactoryPassword="${System.env.REPOSITORY_MANAGER_PASSWORD}"
 
   openShiftUrl = "${System.env.OPENSHIFT_URL}"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
@@ -548,6 +548,7 @@ artifactory {
 }
 if(fullAssemble)
 {
+  upload.dependsOn.add("assemble")
   artifactoryPublish.dependsOn.add("assemble")
   jarFileToS3.dependsOn.add("assemble")
   copyJarToDockerDir.dependsOn("assemble")
