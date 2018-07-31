@@ -548,7 +548,7 @@ artifactory {
 }
 if(fullAssemble)
 {
-  upload.dependsOn.add("assemble")
+  uploadArchives.dependsOn.add("assemble")
   artifactoryPublish.dependsOn.add("assemble")
   jarFileToS3.dependsOn.add("assemble")
   copyJarToDockerDir.dependsOn("assemble")
