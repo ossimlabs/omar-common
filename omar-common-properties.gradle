@@ -9,9 +9,9 @@ buildscript {
     ext {
         springBootV = "1.5.10.RELEASE"
 	springCloudDependencyV = "Dalston.SR5"
-        artifactoryContextUrl="${System.env.REPOSITORY_MANAGER_URL}"
-        ossimMavenProxy="${artifactoryContextUrl}/ossim-deps"
-        omarMavenProxy="${artifactoryContextUrl}/omar-local"
+        nexusContextUrl="${System.env.REPOSITORY_MANAGER_URL}"
+        ossimMavenProxy="${nexusContextUrl}/ossim-deps"
+        omarMavenProxy="${nexusContextUrl}/omar-local"
 	benManesV = "0.17.0"
 	assetPipelineGradleV = "2.14.8"
 	assetPipelineGrailsV = "2.14.8"
@@ -70,7 +70,7 @@ buildscript {
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
-apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
+//apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 //apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
 apply plugin: "maven"
 
@@ -144,8 +144,8 @@ ext {
   // force a check for hash.
   //
   jarArtifactsChanging=true
-  artifactoryUser="${System.env.REPOSITORY_MANAGER_USER}"
-  artifactoryPassword="${System.env.REPOSITORY_MANAGER_PASSWORD}"
+  //artifactoryUser="${System.env.REPOSITORY_MANAGER_USER}"
+  //artifactoryPassword="${System.env.REPOSITORY_MANAGER_PASSWORD}"
 
   openShiftUrl = "${System.env.OPENSHIFT_URL}"
   yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
@@ -524,32 +524,32 @@ task doAll() {
   }
 }
 
-artifactory {
-  contextUrl = "${artifactoryContextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
-  publish {
-    repository {
-      repoKey = "omar-local"
-      username = "${artifactoryUser}"
-      password = "${artifactoryPassword}"
-      maven = true
-    }
-    defaults{
-      publications("mavenJava")
-    }
-  }
-  resolve {
-    repository {
-      repoKey = "omar-local"
-      username = "${artifactoryUser}"
-      password = "${artifactoryPassword}"
-      maven = true
-    }
-  }
-}
+//artifactory {
+//  contextUrl = "${artifactoryContextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
+//  publish {
+//    repository {
+//      repoKey = "omar-local"
+//      username = "${artifactoryUser}"
+//      password = "${artifactoryPassword}"
+//      maven = true
+//    }
+//    defaults{
+//      publications("mavenJava")
+//    }
+//  }
+//  resolve {
+//    repository {
+//      repoKey = "omar-local"
+//      username = "${artifactoryUser}"
+//      password = "${artifactoryPassword}"
+//      maven = true
+//    }
+//  }
+//}
 if(fullAssemble)
 {
   uploadArchives.dependsOn.add("assemble")
-  artifactoryPublish.dependsOn.add("assemble")
+  //artifactoryPublish.dependsOn.add("assemble")
   jarFileToS3.dependsOn.add("assemble")
   copyJarToDockerDir.dependsOn("assemble")
 }
