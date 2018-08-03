@@ -340,7 +340,7 @@ def doFinalVersionCommit() {
 
          // We have to have credentials for this push. They have been set in the main jenkins
          //   environemnt section
-         String pushString = "git --git-dir=${gitRootPath}/.git push --set-upstream https://${System.env.GIT_USER}:${System.env.GIT_PASSWORD}@github.com/ossimlabs/${rootProjectName}.git ${versionBranchToCheck}"
+         String pushString = "git --git-dir=${gitRootPath}/.git push --set-upstream ${System.env.GIT_PUBLIC_SERVER_URL}/${rootProjectName}.git ${versionBranchToCheck}"
 
          def pushProc = "${pushString}".execute()
          pushProc.consumeProcessOutput(sout, serr)
