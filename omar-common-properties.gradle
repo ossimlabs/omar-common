@@ -499,13 +499,6 @@ task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsO
   file = createDockerfile.destFile.toString()
 }
 
-task jarFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask) {
-  def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
-  bucket = "o2-delivery/${gitBranch}/jars"
-  key = "${jarName}"
-  file = "${lazyProperty('projectDir')}/build/libs/${jarName}"
-}
-
 task doAll() {
   dependsOn dockerImageToS3
   dependsOn dockerFileToS3
@@ -550,13 +543,11 @@ if(fullAssemble)
 {
   uploadArchives.dependsOn.add("assemble")
   //artifactoryPublish.dependsOn.add("assemble")
-  jarFileToS3.dependsOn.add("assemble")
   copyJarToDockerDir.dependsOn("assemble")
 }
 
 if( hasJar )
 {
-  doAll.dependsOn.add("jarFileToS3")
   if(lazyProperty('dockerFile'))
   {
      createDockerfile.dependsOn.add("copyJarToDockerDir")
