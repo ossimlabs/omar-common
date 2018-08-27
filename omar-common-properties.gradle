@@ -509,7 +509,7 @@ task dockerImageToS3( dependsOn: saveDockerImage ) {
 task dockerFileToS3( dependsOn: createDockerfile) {
     doLast {
         exec {
-            commandLine "aws", "s3","cp", "${ createDockerfile.destFile.toString() }", "s3://o2-delivery/${ gitBranch }/docker/${project.name}-Dockerfile
+            commandLine "aws", "s3","cp", "${ createDockerfile.destFile.toString() }", "s3://o2-delivery/${ gitBranch }/docker/${project.name}-Dockerfile"
         }
 
     }
