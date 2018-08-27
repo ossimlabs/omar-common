@@ -69,8 +69,6 @@ buildscript {
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
-apply plugin: com.github.skhatri.s3aws.plugin.S3Plugin
-//apply plugin: org.jfrog.gradle.plugin.artifactory.ArtifactoryPlugin
 //apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
 apply plugin: "maven"
 
@@ -483,39 +481,23 @@ task saveDockerImage(dependsOn: pushDockerImage) {
     exec {
       commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
     }
-    //exec {
-    //    commandLine "ls", "-al", "${dockerFile.parentFile}/${project.name}.tgz"
-    //}
   }
 }
 
-// Uses the S3 plugin to push the .tgz file to the ossimlabs
-//task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
 task dockerImageToS3( dependsOn: saveDockerImage ) {
     doLast {
         exec {
-            commandLine "ls", "-lRha", "/media/ephemeral0/jenkins/workspace/tlv-dev"
-        }
-        exec {
             commandLine "aws", "s3","cp", "${ dockerFile.parentFile }/${ imageTgz }", "s3://o2-delivery/${ gitBranch }/docker/${ imageTgz }"
         }
-    //  bucket = "o2-delivery/${gitBranch}/docker"
-    //  key = "${imageTgz}"
-    //  file = ("${dockerFile.parentFile}/${imageTgz}").toString()
     }
 }
 
-//task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: createDockerfile) {
 task dockerFileToS3( dependsOn: createDockerfile) {
     doLast {
         exec {
             commandLine "aws", "s3","cp", "${ createDockerfile.destFile.toString() }", "s3://o2-delivery/${ gitBranch }/docker/${project.name}-Dockerfile"
         }
-
     }
-  //bucket = "o2-delivery/${gitBranch}/docker"
-  //key = "${project.name}-Dockerfile"
-  //file = createDockerfile.destFile.toString()
 }
 
 task doAll() {
