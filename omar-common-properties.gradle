@@ -483,9 +483,9 @@ task saveDockerImage(dependsOn: pushDockerImage) {
     exec {
       commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
     }
-    exec {
-        commandLine "ls", "-al", "${dockerFile.parentFile}/${project.name}.tgz"
-    }
+    //exec {
+    //    commandLine "ls", "-al", "${dockerFile.parentFile}/${project.name}.tgz"
+    //}
   }
 }
 
