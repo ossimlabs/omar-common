@@ -493,7 +493,7 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 //task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
 task dockerImageToS3( dependsOn: saveDockerImage ) {
     exec {
-        commandLine "ls", "-lRha", "${ dockerFile.parentFile }"
+        commandLine "ls", "-lRha", "/media/ephemeral0/jenkins/workspace/tlv-dev"
     }
     exec {
         commandLine "aws", "s3","cp", "${ dockerFile.parentFile }/${ imageTgz }", "s3://o2-delivery/${ gitBranch }/docker/${ imageTgz }"
