@@ -492,15 +492,17 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 // Uses the S3 plugin to push the .tgz file to the ossimlabs
 //task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
 task dockerImageToS3( dependsOn: saveDockerImage ) {
-    exec {
-        commandLine "ls", "-lRha", "/media/ephemeral0/jenkins/workspace/tlv-dev"
+    doLast {
+        exec {
+            commandLine "ls", "-lRha", "/media/ephemeral0/jenkins/workspace/tlv-dev"
+        }
+        //exec {
+        //    commandLine "aws", "s3","cp", "${ dockerFile.parentFile }/${ imageTgz }", "s3://o2-delivery/${ gitBranch }/docker/${ imageTgz }"
+        //}
+    //  bucket = "o2-delivery/${gitBranch}/docker"
+    //  key = "${imageTgz}"
+    //  file = ("${dockerFile.parentFile}/${imageTgz}").toString()
     }
-    //exec {
-    //    commandLine "aws", "s3","cp", "${ dockerFile.parentFile }/${ imageTgz }", "s3://o2-delivery/${ gitBranch }/docker/${ imageTgz }"
-    //}
-//  bucket = "o2-delivery/${gitBranch}/docker"
-//  key = "${imageTgz}"
-//  file = ("${dockerFile.parentFile}/${imageTgz}").toString()
 }
 
 task dockerFileToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: createDockerfile) {
