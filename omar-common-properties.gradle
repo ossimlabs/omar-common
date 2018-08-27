@@ -483,6 +483,9 @@ task saveDockerImage(dependsOn: pushDockerImage) {
     exec {
       commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
     }
+    exec {
+        commandLine 'ls', "-al", "${dockerFile.parentFile}/${project.name}.tgz"
+    }
   }
 }
 
@@ -490,7 +493,7 @@ task saveDockerImage(dependsOn: pushDockerImage) {
 //task dockerImageToS3(type: com.github.skhatri.s3aws.plugin.S3UploadTask, dependsOn: saveDockerImage) {
 task dockerImageToS3( dependsOn: saveDockerImage ) {
     exec {
-        commandLine "ls", "-lRha"
+        commandLine "ls", "-lRha", "${ dockerFile.parentFile }"
     }
     exec {
         commandLine "aws", "s3","cp", "${ dockerFile.parentFile }/${ imageTgz }", "s3://o2-delivery/${ gitBranch }/docker/${ imageTgz }"
