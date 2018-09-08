@@ -133,6 +133,9 @@ ext {
   //   task may change this property to false to indicate processing on the given projectRoot
   //   should come to a stop.
   doVersionUpdateCommit="false"
+  
+  //used in the copyRpmToS3 task in omar-services app build.gradle
+  workingBranch=gitBranch
 
   buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
   //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
