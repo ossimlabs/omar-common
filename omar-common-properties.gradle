@@ -444,7 +444,9 @@ task createDockerfile(type: Dockerfile){
     if(new File("${projectDir}/docker/run.sh").exists())
     {
       instruction "COPY run.sh /home/omar/run.sh"
+      instruction "USER root"
       instruction "RUN chmod ugo+rx /home/omar/run.sh"
+      instruction "USER 1001"
       instruction "CMD /home/omar/run.sh"
     }
     else
