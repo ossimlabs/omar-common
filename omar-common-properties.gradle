@@ -441,7 +441,17 @@ task createDockerfile(type: Dockerfile){
     instruction "EXPOSE 8080"
     instruction "COPY ${jarName} /home/omar"
     instruction 'WORKDIR /home/omar'
-    instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -XX:+UnlockExperimentalVMOptions  -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
+    if(new File("${projectDir}/docker/run.sh").exists())
+    {
+      instruction "COPY run.sh /home/omar/run.sh"
+      instruction "RUN chmod ugo+rx /home/omar/run.sh"
+      instruction "CMD /home/omar/run.sh"
+    }
+    else
+    {
+      instruction "CMD java -server -Xms256m -Xmx1024m -Djava.awt.headless=true -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -XX:+UnlockExperimentalVMOptions  -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -Djava.security.egd=file:/dev/./urandom -jar ${jarName}"
+
+    }
   }
 }
 
