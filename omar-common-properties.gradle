@@ -445,7 +445,7 @@ task createDockerfile(type: Dockerfile){
     {
       instruction "COPY run.sh /home/omar/run.sh"
       instruction "USER root"
-      instruction "RUN yum install -y nss_wrapper gettext && yum clean all && chmod ugo+rx /home/omar/run.sh"
+      instruction "RUN yum install -y nss_wrapper gettext && yum clean all && chmod ugo+rx /home/omar/run.sh && chown 1001:0 /home/omar/*"
       instruction "USER 1001"
       instruction "CMD /home/omar/run.sh"
     }
