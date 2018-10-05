@@ -9,6 +9,9 @@
 # AWS_SECRET_KEY - AWS Secret Key. Optional
 # JAVA_OPTS - Arguments to pass to java to start the app.  Optional
 # 
+if [ -z $HOME ] ; then
+   export HOME=/home/omar
+fi
 if [ ! -z "${AWS_ACCESS_KEY}" ] ; then
   export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 fi
@@ -87,7 +90,7 @@ if [ ! -z "${BUCKETS}" ] ; then
   done
 fi
 
-export JAR_FILE=`find /home/omar -name "*.jar"`
+export JAR_FILE=`find ${HOME} -name "*.jar"`
 
 echo "java ${JAVA_OPTS} -jar ${JAR_FILE}"
 java ${JAVA_OPTS} -jar ${JAR_FILE}
