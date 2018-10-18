@@ -1,72 +1,70 @@
-import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.image.DockerTagImage
-import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
-import com.bmuschko.gradle.docker.tasks.image.DockerRemoveImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import org.gradle.api.tasks.Copy
 
 buildscript {
     ext {
         springBootV = "1.5.10.RELEASE"
-	springCloudDependencyV = "Dalston.SR5"
-        nexusContextUrl="${System.env.REPOSITORY_MANAGER_URL}"
-        ossimMavenProxy="${nexusContextUrl}/ossim-deps"
-        omarMavenProxy="${nexusContextUrl}/omar-local"
-	benManesV = "0.17.0"
-	assetPipelineGradleV = "2.14.10"
-	assetPipelineGrailsV = "2.14.10"
-	springBootAdminStarterClientV = "1.5.7"
-	bootstrapSelectV = "2.0.0-beta1"
-	slickCarouselV = "1.8.1"
-	angularSlickCarouselV = "3.1.7"
-	selectizeV = "0.12.4"
-	seiyriaBootstrapSliderV = "9.7.2"
-	babelAssetPipelineV = "2.1.1"
-	hibernateCoreV = "5.1.9.Final"
-	elImplV = "2.2.1-b05"
-	seleniumHtmlUnitDriverV = "2.52.0"
-	htmlUnitV = "2.29"
-	javaSdkDynamodbV = "1.11.279"
-	springDataDynamodbV = "4.5.0"
-	gradleDockerPluginV = "3.2.4"
-	jodaTimeV = "2.9.9"
-	webjarsSwaggerUIV = "3.10.0"
-	postgressqlV = "42.2.1"
-	hibernateSpatialV = "5.3.0.CR1"
-	hibernate5V = "6.1.8"
-	httpBuilderNgCoreV = "1.0.3"
-	quartzV = "2.0.13"
-	httpBuilderV = "0.7.2"
-	awsJavaSDKV = "1.11.281"
-	commonsIoV = "2.6"
-	springSecurityCoreV = "3.3.0.M1"
-    	npmCesiumV = "1.38.0"
-	hibernateEhcacheV = "5.3.0.CR1"
-  omarCommonProperties = new File(System.env.OMAR_COMMON_PROPERTIES?:"").parentFile.toString();
+        springCloudDependencyV = "Dalston.SR5"
+        nexusContextUrl = "${System.env.REPOSITORY_MANAGER_URL}"
+        ossimMavenProxy = "${nexusContextUrl}/ossim-deps"
+        omarMavenProxy = "${nexusContextUrl}/omar-local"
+        benManesV = "0.17.0"
+        assetPipelineGradleV = "2.14.10"
+        assetPipelineGrailsV = "2.14.10"
+        springBootAdminStarterClientV = "1.5.7"
+        bootstrapSelectV = "2.0.0-beta1"
+        slickCarouselV = "1.8.1"
+        angularSlickCarouselV = "3.1.7"
+        selectizeV = "0.12.4"
+        seiyriaBootstrapSliderV = "9.7.2"
+        babelAssetPipelineV = "2.1.1"
+        hibernateCoreV = "5.1.9.Final"
+        elImplV = "2.2.1-b05"
+        seleniumHtmlUnitDriverV = "2.52.0"
+        htmlUnitV = "2.29"
+        javaSdkDynamodbV = "1.11.279"
+        springDataDynamodbV = "4.5.0"
+        gradleDockerPluginV = "3.2.4"
+        jodaTimeV = "2.9.9"
+        webjarsSwaggerUIV = "3.10.0"
+        postgressqlV = "42.2.1"
+        hibernateSpatialV = "5.3.0.CR1"
+        hibernate5V = "6.1.8"
+        httpBuilderNgCoreV = "1.0.3"
+        quartzV = "2.0.13"
+        httpBuilderV = "0.7.2"
+        awsJavaSDKV = "1.11.281"
+        commonsIoV = "2.6"
+        springSecurityCoreV = "3.3.0.M1"
+        npmCesiumV = "1.38.0"
+        hibernateEhcacheV = "5.3.0.CR1"
+        omarCommonProperties = new File(System.env.OMAR_COMMON_PROPERTIES ?: "").parentFile.toString();
 
         // External vars specific to version updating
-        versionBranchToCheck="dev"
-        versionPathSplitToken="workspace"
-        vupDebug=true
+        versionBranchToCheck = "dev"
+        versionPathSplitToken = "workspace"
+        vupDebug = true
     }
     repositories {
-       mavenLocal()
-       maven { url "${ossimMavenProxy}" }
-       maven { url "${omarMavenProxy}" }
-       if( !System.env.WWW_CONNECTED || Boolean.parseBoolean( System.env.WWW_CONNECTED ) ) {
-        jcenter()
-        maven {
-           url "https://plugins.gradle.org/m2/"
+        mavenLocal()
+        maven { url "${ossimMavenProxy}" }
+        maven { url "${omarMavenProxy}" }
+        if (!System.env.WWW_CONNECTED || Boolean.parseBoolean(System.env.WWW_CONNECTED)) {
+            jcenter()
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
         }
-       }
     }
     dependencies {
-      classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
-      classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
-      classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
-      classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
-      //classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.4"
-   }
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
+        classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
+        //classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.4"
+    }
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
@@ -74,47 +72,39 @@ apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
 apply plugin: "maven"
 
 repositories {
- // maven { url "${ossimMavenProxy}" }
+    // maven { url "${ossimMavenProxy}" }
 }
 
 def lazyProperty(final String propertyName) {
     // Get property.
     def result
     def propertyValue
-    if(project.ext.has(propertyName))
-    {
-      propertyValue = project.ext."${propertyName}"
+    if (project.ext.has(propertyName)) {
+        propertyValue = project.ext."${propertyName}"
+    } else if (project.hasProperty(propertyName)) {
+        propertyValue = project."${propertyName}"
     }
-    else if(project.hasProperty(propertyName))
-    {
-      propertyValue = project."${propertyName}"
-    }
-    if(propertyValue)
-    {
+    if (propertyValue) {
 
-      // Check for type of property to see if we can
-      // run it as a Closure.
-      if (propertyValue instanceof Closure)
-      {
-          // Invoke Closure to calculate the value.
-          result = propertyValue()
-      }
-      else
-      {
-          // Return value as-is.
-          result = propertyValue
-      }
+        // Check for type of property to see if we can
+        // run it as a Closure.
+        if (propertyValue instanceof Closure) {
+            // Invoke Closure to calculate the value.
+            result = propertyValue()
+        } else {
+            // Return value as-is.
+            result = propertyValue
+        }
 
     }
     result
 }
 
 
-
 def getCurrentGitBranch() {
     def gitBranch = "Unknown branch"
     try {
-      println "${project.projectDir}"
+        println "${project.projectDir}"
         def workingDir = new File("${project.projectDir}")
         def result = 'git rev-parse --abbrev-ref HEAD'.execute(null, workingDir)
         result.waitFor()
@@ -122,352 +112,339 @@ def getCurrentGitBranch() {
             gitBranch = result.text.trim()
         }
     } catch (e) {
-      e.printStackTrace()
+        e.printStackTrace()
     }
     return gitBranch
 }
-def gitBranch=getCurrentGitBranch()
+
+def gitBranch = getCurrentGitBranch()
 
 ext {
-  // This property is used exclusively for determining whether or not to do the final git
-  //   git commit for a version updated (or at least checked) repository. The updateTheVersion
-  //   task may change this property to false to indicate processing on the given projectRoot
-  //   should come to a stop.
-  doVersionUpdateCommit="false"
-  
-  //used in the copyRpmToS3 task in omar-services app build.gradle
-  workingBranch=gitBranch
+    // This property is used exclusively for determining whether or not to do the final git
+    //   git commit for a version updated (or at least checked) repository. The updateTheVersion
+    //   task may change this property to false to indicate processing on the given projectRoot
+    //   should come to a stop.
+    doVersionUpdateCommit = "false"
 
-  buildVersionTag=gitBranch=="master"?"RELEASE":"SNAPSHOT"
-  //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
+    //used in the copyRpmToS3 task in omar-services app build.gradle
+    workingBranch = gitBranch
 
-  // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild
-  // all the time even for Patches made to master we need the changing flag to be true.  This will always
-  // force a check for hash.
-  //
-  jarArtifactsChanging=true
-  //artifactoryUser="${System.env.REPOSITORY_MANAGER_USER}"
-  //artifactoryPassword="${System.env.REPOSITORY_MANAGER_PASSWORD}"
+    buildVersionTag = gitBranch == "master" ? "RELEASE" : "SNAPSHOT"
+    //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
 
-  openShiftUrl = "${System.env.OPENSHIFT_URL}"
-  yumTag=(buildVersionTag=="SNAPSHOT"?"dev":"master")
-  dockerAppTag="${System.env.DOCKER_TAG}"
-  dockerRegistryUrl="${System.env.DOCKER_REGISTRY_URL}"
-  registryProjectName="${System.env.REGISTRY_PROJECT_NAME}"
-  openShiftUserName="${System.env.OPENSHIFT_USERNAME}"
-  openShiftPassword="${System.env.OPENSHIFT_PASSWORD}"
-  dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
+    // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild
+    // all the time even for Patches made to master we need the changing flag to be true.  This will always
+    // force a check for hash.
+    //
+    jarArtifactsChanging = true
+    //artifactoryUser="${System.env.REPOSITORY_MANAGER_USER}"
+    //artifactoryPassword="${System.env.REPOSITORY_MANAGER_PASSWORD}"
 
-  image = "${project.name}:${dockerAppTag}"
-  imageTgz = "${project.name}.tgz"
+    openShiftUrl = "${System.env.OPENSHIFT_URL}"
+    yumTag = (buildVersionTag == "SNAPSHOT" ? "dev" : "master")
+    dockerAppTag = "${System.env.DOCKER_TAG}"
+    dockerRegistryUrl = "${System.env.DOCKER_REGISTRY_URL}"
+    registryProjectName = "${System.env.REGISTRY_PROJECT_NAME}"
+    openShiftUserName = "${System.env.OPENSHIFT_USERNAME}"
+    openShiftPassword = "${System.env.OPENSHIFT_PASSWORD}"
+    dockerNamespaceUrl = "${dockerRegistryUrl}/${registryProjectName}/"
 
-  installOssim = true
+    image = "${project.name}:${dockerAppTag}"
+    imageTgz = "${project.name}.tgz"
+
+    installOssim = true
 }
 
 Boolean fullAssemble = lazyProperty('fullAssemble')
-if(fullAssemble == null)
-{
-  String projName = "${project.name}"
-  fullAssemble = true;
-  if(projName.contains("-plugin"))
-  {
-    fullAssemble = false
-  }
+if (fullAssemble == null) {
+    String projName = "${project.name}"
+    fullAssemble = true;
+    if (projName.contains("-plugin")) {
+        fullAssemble = false
+    }
 }
 def dockerFile = lazyProperty('dockerFile')
-if(!dockerFile)
-{
-  dockerFile = project.file('build/libs/Dockerfile')
-}
-else
-{
-  dockerFile = project.file(dockerFile)
+if (!dockerFile) {
+    dockerFile = project.file('build/libs/Dockerfile')
+} else {
+    dockerFile = project.file(dockerFile)
 }
 
 Boolean hasJar = lazyProperty('hasJar')
-if(hasJar == null)
-{
-  hasJar = true
+if (hasJar == null) {
+    hasJar = true
 }
 version "${buildVersion}-${buildVersionTag}"
 
 task checkVersionStatus() {
-   if( Boolean.parseBoolean( System.env.USE_VERSION_STATUS ) ) {
-      println "in checkVersionStatus for '${project.projectDir}'"
-      // Call the radiantblue plugin that checks if anything was committed since last time
-      //dependsOn updateTheVersion
-      doLast {
-         // The external project property 'doVersionUpdateCommit' is defaulted to 'true'
-         //   for every project that gets funneled through this omar-common script. However,
-         //   we are ony interested in doing version updates for the correct repos for this
-         //   rootProject directory. If this script wanders into a different base repo, then
-         //   the 'updateTheVersion' task will set the 'doVersionUpdateCommit' to 'false'
-         //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
-         if (doVersionUpdateCommit == "true") {
-            doFinalVersionCommit()
-         }
-      }
-   }
+    if (Boolean.parseBoolean(System.env.USE_VERSION_STATUS)) {
+        println "in checkVersionStatus for '${project.projectDir}'"
+        // Call the radiantblue plugin that checks if anything was committed since last time
+        //dependsOn updateTheVersion
+        doLast {
+            // The external project property 'doVersionUpdateCommit' is defaulted to 'true'
+            //   for every project that gets funneled through this omar-common script. However,
+            //   we are ony interested in doing version updates for the correct repos for this
+            //   rootProject directory. If this script wanders into a different base repo, then
+            //   the 'updateTheVersion' task will set the 'doVersionUpdateCommit' to 'false'
+            //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
+            if (doVersionUpdateCommit == "true") {
+                doFinalVersionCommit()
+            }
+        }
+    }
 }
 
 def doFinalVersionCommit() {
-   String projectRoot = project.rootDir
-   String rootProject = project.rootProject
-   String projectDir = project.projectDir
-   String gitRootPath
-   String rootProjectName
+    String projectRoot = project.rootDir
+    String rootProject = project.rootProject
+    String projectDir = project.projectDir
+    String gitRootPath
+    String rootProjectName
 
-   println "doFinalVersionCommit: Attempting commit/push for '${projectRoot}'"
+    println "doFinalVersionCommit: Attempting commit/push for '${projectRoot}'"
 
-   // Prepare for jenkins project kluge! The rootPath shouldn't really
-   //   contain full paths to subprojects. It should be the path to the
-   //   location of the .git directory. If this jenkins project
-   //   variable comes in this way, we need to hack it to where the
-   //   .git folder ACTUALLY lives.
-   if (projectRoot.contains("/apps/")) {
-      println "doFinalVersionCommit: **** This project should be refactored '${projectRoot}' ****"
+    // Prepare for jenkins project kluge! The rootPath shouldn't really
+    //   contain full paths to subprojects. It should be the path to the
+    //   location of the .git directory. If this jenkins project
+    //   variable comes in this way, we need to hack it to where the
+    //   .git folder ACTUALLY lives.
+    if (projectRoot.contains("/apps/")) {
+        println "doFinalVersionCommit: **** This project should be refactored '${projectRoot}' ****"
 
-      // Extract the base portion of this path for the REAL rootPath
-      gitRootPath = projectRoot.substring(0, projectRoot.indexOf("/apps/"))
-      String rootTmp = rootProject.substring(rootProject.indexOf("'") + 1)
+        // Extract the base portion of this path for the REAL rootPath
+        gitRootPath = projectRoot.substring(0, projectRoot.indexOf("/apps/"))
+        String rootTmp = rootProject.substring(rootProject.indexOf("'") + 1)
 
-      if (rootTmp != null) {
-         String []tokens = rootTmp.split("-")
-         if (tokens.size() == 2) {
-            rootProjectName = tokens[0]
-         }
-         else {
-            println "doFinalVersionCommit: Odd number of tokens found for '${projectRoot}'"
+        if (rootTmp != null) {
+            String[] tokens = rootTmp.split("-")
+            if (tokens.size() == 2) {
+                rootProjectName = tokens[0]
+            } else {
+                println "doFinalVersionCommit: Odd number of tokens found for '${projectRoot}'"
+                rootProjectName = project.rootProject
+            }
+        } else {
+            println "doFinalVersionCommit: Unparseable rootProject found '${projectRoot}'"
             rootProjectName = project.rootProject
-         }
-      }
-      else {
-         println "doFinalVersionCommit: Unparseable rootProject found '${projectRoot}'"
-         rootProjectName = project.rootProject
-      }
-   }
-   else {
-      gitRootPath = project.rootDir
-      rootProjectName = project.rootProject
-   }
+        }
+    } else {
+        gitRootPath = project.rootDir
+        rootProjectName = project.rootProject
+    }
 
-   // Setup stout and sterr
-   def sout = new StringBuilder(), serr = new StringBuilder()
+    // Setup stout and sterr
+    def sout = new StringBuilder(), serr = new StringBuilder()
 
-   //////////////////////////////////////////////////////////////////////////////
-   // GIT IDENTITY START - Git loudly complains if these are not set.
-   // We need to have a git identity for this commit and subsequent push.
-   def configProc = "git config user.name omarossim".execute()
-   configProc.consumeProcessOutput(sout, serr)
-   configProc.waitFor()
+    //////////////////////////////////////////////////////////////////////////////
+    // GIT IDENTITY START - Git loudly complains if these are not set.
+    // We need to have a git identity for this commit and subsequent push.
+    def configProc = "git config user.name omarossim".execute()
+    configProc.consumeProcessOutput(sout, serr)
+    configProc.waitFor()
 
-   configProc = "git config user.email omarossim@radiantsolutions.com".execute()
-   configProc.consumeProcessOutput(sout, serr)
-   configProc.waitFor()
+    configProc = "git config user.email omarossim@radiantsolutions.com".execute()
+    configProc.consumeProcessOutput(sout, serr)
+    configProc.waitFor()
 
-   configProc = "git config --global push.default simple".execute()
-   configProc.consumeProcessOutput(sout, serr)
-   configProc.waitFor()
-   // GIT IDENTITY END
-   //////////////////////////////////////////////////////////////////////////////
+    configProc = "git config --global push.default simple".execute()
+    configProc.consumeProcessOutput(sout, serr)
+    configProc.waitFor()
+    // GIT IDENTITY END
+    //////////////////////////////////////////////////////////////////////////////
 
-   boolean isDone = false
-   while (!isDone) {
-      sout = new StringBuilder()
-      serr = new StringBuilder()
+    boolean isDone = false
+    while (!isDone) {
+        sout = new StringBuilder()
+        serr = new StringBuilder()
 
-      // Do a fetch, on the off chance something else has been pushed simultaneously
-      String fetchProcStr = "git --git-dir=${gitRootPath}/.git fetch"
-      def fetchProc = "${fetchProcStr}".execute()
-      fetchProc.consumeProcessOutput(sout, serr)
-      fetchProc.waitFor()
-      if (vupDebug) {
-         println "------------------DEBUG----------------------"
-         println "Executing: '${fetchProcStr}'"
-         println "stdout: '${sout}'"
-         println "stderr: '${serr}'"
-         println "------------------DEBUG----------------------"
-      }
-
-      // Reset these
-      sout = new StringBuilder()
-      serr = new StringBuilder()
-
-      // Build the git commit process and execute it for this repo
-      String commitProcStr = "git --git-dir=${gitRootPath}/.git commit -m RELEASE_UPDATE"
-      def commitProc = "${commitProcStr}".execute()
-      commitProc.consumeProcessOutput(sout, serr)
-      commitProc.waitFor()
-      if (vupDebug) {
-         println "------------------DEBUG----------------------"
-         println "Executing: '${commitProcStr}'"
-         println "stdout: '${sout}'"
-         println "stderr: '${serr}'"
-         println "------------------DEBUG----------------------"
-      }
-
-      // Due to the timing of how these parallel build runs, we occassionaly run into a lock file for
-      //   git. If serr is non-zero, that is the case and we should try to wait for the lock file to
-      //   get cleaned up.
-      if (serr != null && serr.size() > 0) {
-         println "ERROR: Git commit FAILED > ${serr}"
-
-         // A simple loop to wait for the git lock file to get cleaned up. Include the failsafe of
-         // maximum attempts to wait for the lock
-         def filename = "${gitRootPath}/.git/index.lock"
-         def lockfile = new File(filename)
-         def lockTries = 0
-         while (lockfile.exists() && ++lockTries < 10) {
-            sleep(2000)
-         }
-
-         // Prevent an infinite wait
-         if (lockTries == 10) {
-            println "WARN: lockTries exceeded for ${filename} --- git commit failed!"
-
-            // Going to eject out of outer loop after 10 attempts to wait/release the lock file
-            isDone = true
-         }
-      }
-      else {
-         isDone = true
-
-         // Reset the string builders for the git push output now
-         sout = new StringBuilder()
-         serr = new StringBuilder()
-
-         // Extract just the project name from the root directory, we need it for the git push string
-         def proj  = new File("${project.rootDir}")
-         String projName = proj.getName()
-
-         // We have to have credentials for this push. They have been set in the main jenkins
-         //   environemnt section
-         String pushString = "git --git-dir=${gitRootPath}/.git push --set-upstream ${System.env.GIT_PUBLIC_SERVER_URL}/${rootProjectName}.git ${versionBranchToCheck}"
-
-         def pushProc = "${pushString}".execute()
-         pushProc.consumeProcessOutput(sout, serr)
-         pushProc.waitFor()
-
-         if (vupDebug) {
+        // Do a fetch, on the off chance something else has been pushed simultaneously
+        String fetchProcStr = "git --git-dir=${gitRootPath}/.git fetch"
+        def fetchProc = "${fetchProcStr}".execute()
+        fetchProc.consumeProcessOutput(sout, serr)
+        fetchProc.waitFor()
+        if (vupDebug) {
             println "------------------DEBUG----------------------"
-            println "Executing: '${pushString}'"
+            println "Executing: '${fetchProcStr}'"
             println "stdout: '${sout}'"
             println "stderr: '${serr}'"
             println "------------------DEBUG----------------------"
-         }
-      }
-   }
+        }
+
+        // Reset these
+        sout = new StringBuilder()
+        serr = new StringBuilder()
+
+        // Build the git commit process and execute it for this repo
+        String commitProcStr = "git --git-dir=${gitRootPath}/.git commit -m RELEASE_UPDATE"
+        def commitProc = "${commitProcStr}".execute()
+        commitProc.consumeProcessOutput(sout, serr)
+        commitProc.waitFor()
+        if (vupDebug) {
+            println "------------------DEBUG----------------------"
+            println "Executing: '${commitProcStr}'"
+            println "stdout: '${sout}'"
+            println "stderr: '${serr}'"
+            println "------------------DEBUG----------------------"
+        }
+
+        // Due to the timing of how these parallel build runs, we occassionaly run into a lock file for
+        //   git. If serr is non-zero, that is the case and we should try to wait for the lock file to
+        //   get cleaned up.
+        if (serr != null && serr.size() > 0) {
+            println "ERROR: Git commit FAILED > ${serr}"
+
+            // A simple loop to wait for the git lock file to get cleaned up. Include the failsafe of
+            // maximum attempts to wait for the lock
+            def filename = "${gitRootPath}/.git/index.lock"
+            def lockfile = new File(filename)
+            def lockTries = 0
+            while (lockfile.exists() && ++lockTries < 10) {
+                sleep(2000)
+            }
+
+            // Prevent an infinite wait
+            if (lockTries == 10) {
+                println "WARN: lockTries exceeded for ${filename} --- git commit failed!"
+
+                // Going to eject out of outer loop after 10 attempts to wait/release the lock file
+                isDone = true
+            }
+        } else {
+            isDone = true
+
+            // Reset the string builders for the git push output now
+            sout = new StringBuilder()
+            serr = new StringBuilder()
+
+            // Extract just the project name from the root directory, we need it for the git push string
+            def proj = new File("${project.rootDir}")
+            String projName = proj.getName()
+
+            // We have to have credentials for this push. They have been set in the main jenkins
+            //   environemnt section
+            String pushString = "git --git-dir=${gitRootPath}/.git push --set-upstream ${System.env.GIT_PUBLIC_SERVER_URL}/${rootProjectName}.git ${versionBranchToCheck}"
+
+            def pushProc = "${pushString}".execute()
+            pushProc.consumeProcessOutput(sout, serr)
+            pushProc.waitFor()
+
+            if (vupDebug) {
+                println "------------------DEBUG----------------------"
+                println "Executing: '${pushString}'"
+                println "stdout: '${sout}'"
+                println "stderr: '${serr}'"
+                println "------------------DEBUG----------------------"
+            }
+        }
+    }
 }
 
-task logIn () {
-  doLast {
-    def login = false
-    def count = 0
-    def numRetries = 3
-    def sleepMillis = 1000
-    while(!login && count < numRetries){
-      try{
+task logIn() {
+    doLast {
+        def login = false
+        def count = 0
+        def numRetries = 3
+        def sleepMillis = 1000
+        while (!login && count < numRetries) {
+            try {
+                exec {
+                    commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
+                            '-u', openShiftUserName,
+                            '-p', openShiftPassword
+                }
+                login = true
+            }
+            catch (e) {
+
+                println 'Openshift login failed!'
+                count++
+                if (count < numRetries) {
+                    Thread.sleep(sleepMillis)
+                } else {
+                    throw (e)
+                }
+            }
+        }
+
+        def loginTokenStream = new ByteArrayOutputStream()
         exec {
-          commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
-           '-u', openShiftUserName,
-           '-p', openShiftPassword
+            commandLine 'oc', 'whoami', '-t'
+            standardOutput loginTokenStream
         }
-        login = true
-      }
-      catch(e){
 
-        println 'Openshift login failed!'
-        count++
-        if(count < numRetries){
-          Thread.sleep(sleepMillis)
+        def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
+        println loginToken
+        exec {
+            commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
         }
-        else {
-          throw(e)
-        }
-      }
     }
-
-    def loginTokenStream = new ByteArrayOutputStream()
-    exec {
-      commandLine 'oc', 'whoami', '-t'
-      standardOutput loginTokenStream
-    }
-
-    def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
-    println loginToken
-    exec {
-     commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
-    }
-  }
 }
 
 
-task downloadBaseImage(type:com.github.skhatri.s3aws.plugin.S3DownloadTask) {
-  bucket = "o2-delivery/${gitBranch}/docker"
-  key = "${lazyProperty('baseImage')}.tgz"
-  saveTo = file("${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz")
+task downloadBaseImage(type: com.github.skhatri.s3aws.plugin.S3DownloadTask) {
+    bucket = "o2-delivery/${gitBranch}/docker"
+    key = "${lazyProperty('baseImage')}.tgz"
+    saveTo = file("${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz")
 }
 
 task loadBaseDockerImage(dependsOn: downloadBaseImage) {
 
-  doLast {
-    exec {
-      commandLine 'docker', 'load', '-i', "${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz"
+    doLast {
+        exec {
+            commandLine 'docker', 'load', '-i', "${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz"
+        }
     }
-  }
 }
 
-task copyJarToDockerDir(type: Copy){
-  from "${buildDir}/libs/${project.name}-${buildVersion}-${buildVersionTag}.jar"
-  into "${projectDir}/docker"
+task copyJarToDockerDir(type: Copy) {
+    from "${buildDir}/libs/${project.name}-${buildVersion}-${buildVersionTag}.jar"
+    into "${projectDir}/docker"
 }
 
 //task createDockerfile(type: Dockerfile, dependsOn: loadBaseDockerImage){
-task createDockerfile(type: Dockerfile){
+task createDockerfile(type: Dockerfile) {
 
-  def statementOverride = lazyProperty("dockerStatementsOverride");
-  def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
-  destFile = dockerFile
-  if(statementOverride)
-  {
-    statementOverride.each{
-      instruction it
-    }
-  }
-  else
-  {
-    instruction "FROM ${lazyProperty('dockerNamespaceUrl')}${lazyProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
-    instruction """ENV SPRING_CLOUD_CONFIG_ENABLED=true \\
+    def statementOverride = lazyProperty("dockerStatementsOverride");
+    def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
+    destFile = dockerFile
+    if (statementOverride) {
+        statementOverride.each {
+            instruction it
+        }
+    } else {
+        instruction "FROM ${lazyProperty('dockerNamespaceUrl')}${lazyProperty('baseImage')}:${lazyProperty('dockerAppTag')}"
+        instruction """ENV SPRING_CLOUD_CONFIG_ENABLED=true \\
                        SPRING_CLOUD_DISCOVERY_ENABLED=true \\
                        HOME=/home/omar"""
-    instruction "EXPOSE 8080"
-    instruction "COPY ${jarName} \$HOME"
-    instruction 'WORKDIR \$HOME'
-    instruction "CMD \$HOME/run.sh"
-  }
+        instruction "EXPOSE 8080"
+        instruction "COPY ${jarName} \$HOME"
+        instruction 'WORKDIR \$HOME'
+        instruction "CMD \$HOME/run.sh"
+    }
 }
 
 task buildDockerImage(type: DockerBuildImage) {
-  dependsOn createDockerfile
-  dependsOn logIn
-  inputDir = createDockerfile.destFile.parentFile
-  tag = "${image}"
+    dependsOn createDockerfile
+    dependsOn logIn
+    inputDir = createDockerfile.destFile.parentFile
+    tag = "${image}"
 }
 
-task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage){
-  imageId "${image}"
-  tag "${dockerAppTag}"
-  repository  "${dockerNamespaceUrl}${project.name}"
+task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
+    imageId "${image}"
+    tag "${dockerAppTag}"
+    repository "${dockerNamespaceUrl}${project.name}"
 }
 
 
-task pushDockerImage(/*type: DockerPushImage*/){
-  dependsOn tagDockerImage
-  doLast {
-    exec {
-      commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
+task pushDockerImage(/*type: DockerPushImage*/) {
+    dependsOn tagDockerImage
+    doLast {
+        exec {
+            commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
+        }
     }
-  }
 /*
   dependsOn tagDockerImage
 
@@ -476,51 +453,51 @@ task pushDockerImage(/*type: DockerPushImage*/){
 }
 
 task saveDockerImage(dependsOn: pushDockerImage) {
-  doLast {
-    exec {
-      commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.tar"
-    }
-    exec {
-      commandLine 'gzip', "-f","-S", ".gz", "${dockerFile.parentFile}/${project.name}.tar"
-    }
-    exec {
-      commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
-    }
-  }
-}
-
-task dockerImageToS3( dependsOn: saveDockerImage ) {
     doLast {
         exec {
-            commandLine "aws", "s3","cp", "${ dockerFile.parentFile }/${ imageTgz }", "s3://o2-delivery/${ gitBranch }/docker/${ imageTgz }"
+            commandLine 'docker', 'save', image, "-o", "${dockerFile.parentFile}/${project.name}.tar"
+        }
+        exec {
+            commandLine 'gzip', "-f", "-S", ".gz", "${dockerFile.parentFile}/${project.name}.tar"
+        }
+        exec {
+            commandLine 'mv', "-f", "${dockerFile.parentFile}/${project.name}.tar.gz", "${dockerFile.parentFile}/${project.name}.tgz"
         }
     }
 }
 
-task dockerFileToS3( dependsOn: createDockerfile) {
+task dockerImageToS3(dependsOn: saveDockerImage) {
     doLast {
         exec {
-            commandLine "aws", "s3","cp", "${ createDockerfile.destFile.toString() }", "s3://o2-delivery/${ gitBranch }/docker/${project.name}-Dockerfile"
+            commandLine "aws", "s3", "cp", "${dockerFile.parentFile}/${imageTgz}", "s3://o2-delivery/${gitBranch}/docker/${imageTgz}"
+        }
+    }
+}
+
+task dockerFileToS3(dependsOn: createDockerfile) {
+    doLast {
+        exec {
+            commandLine "aws", "s3", "cp", "${createDockerfile.destFile.toString()}", "s3://o2-delivery/${gitBranch}/docker/${project.name}-Dockerfile"
         }
     }
 }
 
 task doAll() {
-  dependsOn dockerImageToS3
-  dependsOn dockerFileToS3
+    dependsOn dockerImageToS3
+    dependsOn dockerFileToS3
 
-  doLast{
-    exec {
-      // Removes the image that is pushed to the remote repository
-      // from the local Docker registry
-      commandLine 'docker', 'rmi', "-f", "${dockerNamespaceUrl}${image}"
+    doLast {
+        exec {
+            // Removes the image that is pushed to the remote repository
+            // from the local Docker registry
+            commandLine 'docker', 'rmi', "-f", "${dockerNamespaceUrl}${image}"
+        }
+        exec {
+            // Removes the default image created during the build process from
+            // from the local Docker registry
+            commandLine 'docker', 'rmi', "-f", image
+        }
     }
-    exec {
-      // Removes the default image created during the build process from
-      // from the local Docker registry
-      commandLine 'docker', 'rmi', "-f", image
-    }
-  }
 }
 
 //artifactory {
@@ -545,26 +522,23 @@ task doAll() {
 //    }
 //  }
 //}
-if(fullAssemble)
-{
-  uploadArchives.dependsOn.add("assemble")
-  //artifactoryPublish.dependsOn.add("assemble")
-  copyJarToDockerDir.dependsOn("assemble")
+if (fullAssemble) {
+    uploadArchives.dependsOn.add("assemble")
+    //artifactoryPublish.dependsOn.add("assemble")
+    copyJarToDockerDir.dependsOn("assemble")
 }
 
-if( hasJar )
-{
-  if(lazyProperty('dockerFile'))
-  {
-     createDockerfile.dependsOn.add("copyJarToDockerDir")
-  }
+if (hasJar) {
+    if (lazyProperty('dockerFile')) {
+        createDockerfile.dependsOn.add("copyJarToDockerDir")
+    }
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "${ System.env.REPOSITORY_MANAGER_URL }/omar-local-${ buildVersionTag.toLowerCase() }") {
-                authentication( userName: "${ System.env.REPOSITORY_MANAGER_USER }", password: "${ System.env.REPOSITORY_MANAGER_PASSWORD }" )
+            repository(url: "${System.env.REPOSITORY_MANAGER_URL}/omar-local-${buildVersionTag.toLowerCase()}") {
+                authentication(userName: "${System.env.REPOSITORY_MANAGER_USER}", password: "${System.env.REPOSITORY_MANAGER_PASSWORD}")
             }
         }
     }
