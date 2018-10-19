@@ -40,12 +40,7 @@ buildscript {
         springSecurityCoreV = "3.3.0.M1"
         npmCesiumV = "1.38.0"
         hibernateEhcacheV = "5.3.0.CR1"
-        omarCommonProperties = new File(System.env.OMAR_COMMON_PROPERTIES ?: "").parentFile.toString();
-
-        // External vars specific to version updating
-        versionBranchToCheck = "dev"
-        versionPathSplitToken = "workspace"
-        vupDebug = true
+        omarCommonProperties = new File(System.env.OMAR_COMMON_PROPERTIES ?: "").parentFile.toString()
     }
     repositories {
         mavenLocal()
@@ -63,12 +58,10 @@ buildscript {
         classpath 'com.github.skhatri:gradle-s3-plugin:1.0.4'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
-        //classpath "com.radiantblue.versionupdater:versionUpdaterPlugin:1.7.4"
     }
 }
 
 apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
-//apply plugin: com.radiantblue.versionupdater.VersionUpdaterPlugin
 apply plugin: "maven"
 
 repositories {
@@ -76,16 +69,16 @@ repositories {
 }
 
 def lazyProperty(final String propertyName) {
-    // Get property.
-    def result
+    def result = null
     def propertyValue
+
     if (project.ext.has(propertyName)) {
         propertyValue = project.ext."${propertyName}"
     } else if (project.hasProperty(propertyName)) {
         propertyValue = project."${propertyName}"
     }
-    if (propertyValue) {
 
+    if (propertyValue) {
         // Check for type of property to see if we can
         // run it as a Closure.
         if (propertyValue instanceof Closure) {
@@ -97,11 +90,12 @@ def lazyProperty(final String propertyName) {
         }
 
     }
-    result
+
+    return result
 }
 
 
-def getCurrentGitBranch() {
+String getCurrentGitBranch() {
     def gitBranch = "Unknown branch"
     try {
         println "${project.projectDir}"
@@ -120,24 +114,10 @@ def getCurrentGitBranch() {
 def gitBranch = getCurrentGitBranch()
 
 ext {
-    // This property is used exclusively for determining whether or not to do the final git
-    //   git commit for a version updated (or at least checked) repository. The updateTheVersion
-    //   task may change this property to false to indicate processing on the given projectRoot
-    //   should come to a stop.
-    doVersionUpdateCommit = "false"
-
     //used in the copyRpmToS3 task in omar-services app build.gradle
     workingBranch = gitBranch
 
     buildVersionTag = gitBranch == "master" ? "RELEASE" : "SNAPSHOT"
-    //  jarArtifactsChanging="${buildVersionTag}" == "SNAPSHOT" ? true:false
-
-    // for now we will set it to true until we get the versioning going.  For our JARS that we rebuild
-    // all the time even for Patches made to master we need the changing flag to be true.  This will always
-    // force a check for hash.
-    //
-    jarArtifactsChanging = true
-
     openShiftUrl = "${System.env.OPENSHIFT_URL}"
     yumTag = (buildVersionTag == "SNAPSHOT" ? "dev" : "master")
     dockerAppTag = "${System.env.DOCKER_TAG}"
@@ -161,6 +141,7 @@ if (fullAssemble == null) {
         fullAssemble = false
     }
 }
+
 def dockerFile = lazyProperty('dockerFile')
 if (!dockerFile) {
     dockerFile = project.file('build/libs/Dockerfile')
@@ -172,171 +153,8 @@ Boolean hasJar = lazyProperty('hasJar')
 if (hasJar == null) {
     hasJar = true
 }
+
 version "${buildVersion}-${buildVersionTag}"
-
-task checkVersionStatus() {
-    if (Boolean.parseBoolean(System.env.USE_VERSION_STATUS)) {
-        println "in checkVersionStatus for '${project.projectDir}'"
-        // Call the radiantblue plugin that checks if anything was committed since last time
-        //dependsOn updateTheVersion
-        doLast {
-            // The external project property 'doVersionUpdateCommit' is defaulted to 'true'
-            //   for every project that gets funneled through this omar-common script. However,
-            //   we are ony interested in doing version updates for the correct repos for this
-            //   rootProject directory. If this script wanders into a different base repo, then
-            //   the 'updateTheVersion' task will set the 'doVersionUpdateCommit' to 'false'
-            //   for that repo an the call to 'doFinalVersionCommit' will be skipped.
-            if (doVersionUpdateCommit == "true") {
-                doFinalVersionCommit()
-            }
-        }
-    }
-}
-
-def doFinalVersionCommit() {
-    String projectRoot = project.rootDir
-    String rootProject = project.rootProject
-    String projectDir = project.projectDir
-    String gitRootPath
-    String rootProjectName
-
-    println "doFinalVersionCommit: Attempting commit/push for '${projectRoot}'"
-
-    // Prepare for jenkins project kluge! The rootPath shouldn't really
-    //   contain full paths to subprojects. It should be the path to the
-    //   location of the .git directory. If this jenkins project
-    //   variable comes in this way, we need to hack it to where the
-    //   .git folder ACTUALLY lives.
-    if (projectRoot.contains("/apps/")) {
-        println "doFinalVersionCommit: **** This project should be refactored '${projectRoot}' ****"
-
-        // Extract the base portion of this path for the REAL rootPath
-        gitRootPath = projectRoot.substring(0, projectRoot.indexOf("/apps/"))
-        String rootTmp = rootProject.substring(rootProject.indexOf("'") + 1)
-
-        if (rootTmp != null) {
-            String[] tokens = rootTmp.split("-")
-            if (tokens.size() == 2) {
-                rootProjectName = tokens[0]
-            } else {
-                println "doFinalVersionCommit: Odd number of tokens found for '${projectRoot}'"
-                rootProjectName = project.rootProject
-            }
-        } else {
-            println "doFinalVersionCommit: Unparseable rootProject found '${projectRoot}'"
-            rootProjectName = project.rootProject
-        }
-    } else {
-        gitRootPath = project.rootDir
-        rootProjectName = project.rootProject
-    }
-
-    // Setup stout and sterr
-    def sout = new StringBuilder(), serr = new StringBuilder()
-
-    //////////////////////////////////////////////////////////////////////////////
-    // GIT IDENTITY START - Git loudly complains if these are not set.
-    // We need to have a git identity for this commit and subsequent push.
-    def configProc = "git config user.name omarossim".execute()
-    configProc.consumeProcessOutput(sout, serr)
-    configProc.waitFor()
-
-    configProc = "git config user.email omarossim@radiantsolutions.com".execute()
-    configProc.consumeProcessOutput(sout, serr)
-    configProc.waitFor()
-
-    configProc = "git config --global push.default simple".execute()
-    configProc.consumeProcessOutput(sout, serr)
-    configProc.waitFor()
-    // GIT IDENTITY END
-    //////////////////////////////////////////////////////////////////////////////
-
-    boolean isDone = false
-    while (!isDone) {
-        sout = new StringBuilder()
-        serr = new StringBuilder()
-
-        // Do a fetch, on the off chance something else has been pushed simultaneously
-        String fetchProcStr = "git --git-dir=${gitRootPath}/.git fetch"
-        def fetchProc = "${fetchProcStr}".execute()
-        fetchProc.consumeProcessOutput(sout, serr)
-        fetchProc.waitFor()
-        if (vupDebug) {
-            println "------------------DEBUG----------------------"
-            println "Executing: '${fetchProcStr}'"
-            println "stdout: '${sout}'"
-            println "stderr: '${serr}'"
-            println "------------------DEBUG----------------------"
-        }
-
-        // Reset these
-        sout = new StringBuilder()
-        serr = new StringBuilder()
-
-        // Build the git commit process and execute it for this repo
-        String commitProcStr = "git --git-dir=${gitRootPath}/.git commit -m RELEASE_UPDATE"
-        def commitProc = "${commitProcStr}".execute()
-        commitProc.consumeProcessOutput(sout, serr)
-        commitProc.waitFor()
-        if (vupDebug) {
-            println "------------------DEBUG----------------------"
-            println "Executing: '${commitProcStr}'"
-            println "stdout: '${sout}'"
-            println "stderr: '${serr}'"
-            println "------------------DEBUG----------------------"
-        }
-
-        // Due to the timing of how these parallel build runs, we occassionaly run into a lock file for
-        //   git. If serr is non-zero, that is the case and we should try to wait for the lock file to
-        //   get cleaned up.
-        if (serr != null && serr.size() > 0) {
-            println "ERROR: Git commit FAILED > ${serr}"
-
-            // A simple loop to wait for the git lock file to get cleaned up. Include the failsafe of
-            // maximum attempts to wait for the lock
-            def filename = "${gitRootPath}/.git/index.lock"
-            def lockfile = new File(filename)
-            def lockTries = 0
-            while (lockfile.exists() && ++lockTries < 10) {
-                sleep(2000)
-            }
-
-            // Prevent an infinite wait
-            if (lockTries == 10) {
-                println "WARN: lockTries exceeded for ${filename} --- git commit failed!"
-
-                // Going to eject out of outer loop after 10 attempts to wait/release the lock file
-                isDone = true
-            }
-        } else {
-            isDone = true
-
-            // Reset the string builders for the git push output now
-            sout = new StringBuilder()
-            serr = new StringBuilder()
-
-            // Extract just the project name from the root directory, we need it for the git push string
-            def proj = new File("${project.rootDir}")
-            String projName = proj.getName()
-
-            // We have to have credentials for this push. They have been set in the main jenkins
-            //   environemnt section
-            String pushString = "git --git-dir=${gitRootPath}/.git push --set-upstream ${System.env.GIT_PUBLIC_SERVER_URL}/${rootProjectName}.git ${versionBranchToCheck}"
-
-            def pushProc = "${pushString}".execute()
-            pushProc.consumeProcessOutput(sout, serr)
-            pushProc.waitFor()
-
-            if (vupDebug) {
-                println "------------------DEBUG----------------------"
-                println "Executing: '${pushString}'"
-                println "stdout: '${sout}'"
-                println "stderr: '${serr}'"
-                println "------------------DEBUG----------------------"
-            }
-        }
-    }
-}
 
 task logIn() {
     doLast {
@@ -387,7 +205,6 @@ task downloadBaseImage(type: com.github.skhatri.s3aws.plugin.S3DownloadTask) {
 }
 
 task loadBaseDockerImage(dependsOn: downloadBaseImage) {
-
     doLast {
         exec {
             commandLine 'docker', 'load', '-i', "${dockerFile.parentFile}/${lazyProperty('baseImage')}.tgz"
@@ -401,7 +218,6 @@ task copyJarToDockerDir(type: Copy) {
 }
 
 task createDockerfile(type: Dockerfile) {
-
     def statementOverride = lazyProperty("dockerStatementsOverride");
     def jarName = "${project.name}-${buildVersion}-${buildVersionTag}.jar"
     destFile = dockerFile
@@ -433,7 +249,6 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
     tag "${dockerAppTag}"
     repository "${dockerNamespaceUrl}${project.name}"
 }
-
 
 task pushDockerImage(/*type: DockerPushImage*/) {
     dependsOn tagDockerImage
@@ -492,18 +307,6 @@ task doAll() {
     }
 }
 
-if (fullAssemble) {
-    uploadArchives.dependsOn.add("assemble")
-    //artifactoryPublish.dependsOn.add("assemble")
-    copyJarToDockerDir.dependsOn("assemble")
-}
-
-if (hasJar) {
-    if (lazyProperty('dockerFile')) {
-        createDockerfile.dependsOn.add("copyJarToDockerDir")
-    }
-}
-
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -511,5 +314,18 @@ uploadArchives {
                 authentication(userName: "${System.env.REPOSITORY_MANAGER_USER}", password: "${System.env.REPOSITORY_MANAGER_PASSWORD}")
             }
         }
+    }
+}
+
+
+
+if (fullAssemble) {
+    uploadArchives.dependsOn.add("assemble")
+    copyJarToDockerDir.dependsOn("assemble")
+}
+
+if (hasJar) {
+    if (lazyProperty('dockerFile')) {
+        createDockerfile.dependsOn.add("copyJarToDockerDir")
     }
 }
