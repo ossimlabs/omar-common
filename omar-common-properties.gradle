@@ -162,6 +162,7 @@ task logIn() {
         def count = 0
         def numRetries = 3
         def sleepMillis = 1000
+/*
         while (!login && count < numRetries) {
             try {
                 exec {
@@ -191,8 +192,10 @@ task logIn() {
 
         def loginToken = new String(loginTokenStream.toByteArray(), 'UTF-8')?.trim()
         println loginToken
+*/
         exec {
-            commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
+//            commandLine 'docker', 'login', '-p', loginToken, '-u', 'unused', dockerRegistryUrl
+            commandLine 'docker', 'login', '-p', System.getenv('DOCKER_REGISTRY_PASSWORD'), '-u', System.getenv('DOCKER_REGISTRY_USERNAME'), dockerRegistryUrl
         }
     }
 }
