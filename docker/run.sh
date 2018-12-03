@@ -90,7 +90,7 @@ if [ ! -z "${BUCKETS}" ] ; then
   done
 fi
 
-export JAR_FILE=`find ${HOME} -name "*.jar"`
+export JAR_FILE=`find ${HOME} -maxdepth 1 -name "*.jar"`
 
 echo "java ${JAVA_OPTS} -jar ${JAR_FILE}"
 java ${JAVA_OPTS} -jar ${JAR_FILE}
