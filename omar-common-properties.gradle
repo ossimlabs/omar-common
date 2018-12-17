@@ -157,28 +157,30 @@ if (hasJar == null) {
 version "${buildVersion}-${buildVersionTag}"
 
 task logInOpenshift() {
-    def login = false
-    def count = 0
-    def numRetries = 3
-    def sleepMillis = 1000
+    doLast {
+        def login = false
+        def count = 0
+        def numRetries = 3
+        def sleepMillis = 1000
 
-    while (!login && count < numRetries) {
-        try {
-            exec {
-                commandLine 'oc', 'login', openShiftUrl,
-                        '-u', openShiftUserName,
-                        '-p', openShiftPassword
+        while (!login && count < numRetries) {
+            try {
+                exec {
+                    commandLine 'oc', 'login', openShiftUrl,
+                            '-u', openShiftUserName,
+                            '-p', openShiftPassword
+                }
+                login = true
             }
-            login = true
-        }
-        catch (e) {
+            catch (e) {
 
-            println 'Openshift login failed!'
-            count++
-            if (count < numRetries) {
-                Thread.sleep(sleepMillis)
-            } else {
-                throw (e)
+                println 'Openshift login failed!'
+                count++
+                if (count < numRetries) {
+                    Thread.sleep(sleepMillis)
+                } else {
+                    throw (e)
+                }
             }
         }
     }
