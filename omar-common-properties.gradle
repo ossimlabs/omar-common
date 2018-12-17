@@ -156,6 +156,34 @@ if (hasJar == null) {
 
 version "${buildVersion}-${buildVersionTag}"
 
+task logInOpenshift() {
+    def login = false
+    def count = 0
+    def numRetries = 3
+    def sleepMillis = 1000
+
+    while (!login && count < numRetries) {
+        try {
+            exec {
+                commandLine 'oc', 'login', openShiftUrl,
+                        '-u', openShiftUserName,
+                        '-p', openShiftPassword
+            }
+            login = true
+        }
+        catch (e) {
+
+            println 'Openshift login failed!'
+            count++
+            if (count < numRetries) {
+                Thread.sleep(sleepMillis)
+            } else {
+                throw (e)
+            }
+        }
+    }
+}
+
 task logIn() {
     doLast {
 /*
@@ -255,10 +283,11 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
 }
 
 task pushDockerImage(/*type: DockerPushImage*/) {
-    dependsOn tagDockerImage
+    dependsOn tagDockerImage logInOpenshift
     doLast {
         exec {
             commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
+            commandLine 'oc' 'tag' '--source=docker' "${dockerNamespaceUrl}:${image}" "${image}" '--scheduled=true'
         }
     }
 }
