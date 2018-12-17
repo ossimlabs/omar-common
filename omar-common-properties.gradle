@@ -165,7 +165,7 @@ task logInOpenshift() {
     while (!login && count < numRetries) {
         try {
             exec {
-                commandLine 'oc', 'login', '--insecure-skip-tls-verify', openShiftUrl,
+                commandLine 'oc', 'login', openShiftUrl,
                         '-u', openShiftUserName,
                         '-p', openShiftPassword
             }
