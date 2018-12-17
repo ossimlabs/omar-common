@@ -290,7 +290,7 @@ task pushDockerImage(/*type: DockerPushImage*/) {
     doLast {
         exec {
             commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
-            commandLine 'oc' 'tag' '--source=docker' "${dockerNamespaceUrl}:${image}" "${image}" '--scheduled=true'
+            commandLine 'oc', 'tag', '--source=docker', "${dockerNamespaceUrl}:${image}", "${image}", '--scheduled=true'
         }
     }
 }
