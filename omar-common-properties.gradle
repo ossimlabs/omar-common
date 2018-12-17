@@ -285,7 +285,8 @@ task tagDockerImage(type: DockerTagImage, dependsOn: buildDockerImage) {
 }
 
 task pushDockerImage(/*type: DockerPushImage*/) {
-    dependsOn tagDockerImage logInOpenshift
+    dependsOn tagDockerImage
+    dependsOn logInOpenshift
     doLast {
         exec {
             commandLine 'docker', 'push', "${dockerNamespaceUrl}${image}"
