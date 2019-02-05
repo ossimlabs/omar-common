@@ -112,6 +112,7 @@ ext {
     workingBranch = gitBranch
 
     buildVersionTag = gitBranch == "master" ? "RELEASE" : "SNAPSHOT"
+    latestGradleIdentifier = gitBranch == "master" ? "latest.release" : "latest.integration"
     openShiftUrl = "${System.env.OPENSHIFT_URL}"
     yumTag = (buildVersionTag == "SNAPSHOT" ? "dev" : "master")
     dockerAppTag = "${System.env.DOCKER_TAG}"
