@@ -46,12 +46,6 @@ buildscript {
         mavenLocal()
         maven { url "${ossimMavenProxy}" }
         maven { url "${omarMavenProxy}" }
-        if (!System.env.WWW_CONNECTED || Boolean.parseBoolean(System.env.WWW_CONNECTED)) {
-            jcenter()
-            maven {
-                url "https://plugins.gradle.org/m2/"
-            }
-        }
     }
     dependencies {
         classpath 'com.bmuschko:gradle-docker-plugin:3.0.12'
